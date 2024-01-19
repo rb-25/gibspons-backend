@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class SponsorshipAppConfig(AppConfig):
+class UsersConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'sponsorship_app'
+    name = 'users'
