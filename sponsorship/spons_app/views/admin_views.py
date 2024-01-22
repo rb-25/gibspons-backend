@@ -9,6 +9,7 @@ from ..models import Event,Sponsorship
 from ..serializers import EventSerializer,DeleteEventSerializer,SponsorshipSerializer
 from ..permissions import IsAdmin
 
+#-------------CRUD EVENT-----------------
 class CreateEventView(APIView):
     permission_classes = [IsAuthenticated,IsAdmin]
     authentication_classes=[JWTAuthentication]
@@ -29,7 +30,6 @@ class UpdateEventView(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-#change status code
 class DeleteEventView(APIView):
     permission_classes=[IsAuthenticated, IsAdmin]
     authentication_classes=[JWTAuthentication]
@@ -40,6 +40,7 @@ class DeleteEventView(APIView):
         event_to_delete.delete()
         return Response({'message': 'Event deleted successfully'}, status=status.HTTP_200_OK)
         
+
 
 class AddMoneyView(APIView):
     permission_classes=[IsAuthenticated,IsAdmin]

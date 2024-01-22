@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import *
 
+#------------EVENT SERIALIZERS-------------
+
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model=Event
@@ -9,6 +11,8 @@ class EventSerializer(serializers.ModelSerializer):
     
 class DeleteEventSerializer(serializers.Serializer):
     id=serializers.IntegerField()
+    
+#--------------COMPANY SERIALIZERS -----------------
         
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,6 +23,7 @@ class CompanySerializer(serializers.ModelSerializer):
 class DeleteCompanySerializer(serializers.Serializer):
     id=serializers.IntegerField()
 
+#---------POC SERIALIZERS ------------
 class POCSerializer(serializers.ModelSerializer):
     class Meta:
         model=POC
@@ -27,6 +32,7 @@ class POCSerializer(serializers.ModelSerializer):
 class DeletePOCSerializer(serializers.Serializer):
     id=serializers.IntegerField()
 
+#-----------SPONSORSHIP SERIALIZERS-------------
 class SponsorshipSerializer(serializers.ModelSerializer):
     class Meta:
         model=Sponsorship

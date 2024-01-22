@@ -4,7 +4,7 @@ from django.db import models
 class Company(models.Model):
     name=models.CharField(max_length=254)
     website=models.URLField()
-    domain=models.CharField(max_length=50)
+    industry=models.CharField(max_length=50)
     status=models.CharField(max_length=20)
     user_id=models.ForeignKey('users.User', on_delete=models.SET_NULL,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
