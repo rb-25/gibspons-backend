@@ -17,7 +17,7 @@ class DeleteEventSerializer(serializers.Serializer):
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model=Company
-        fields=['id','name','website','domain']
+        fields=['id','name','website','industry']
         
 
 class DeleteCompanySerializer(serializers.Serializer):
