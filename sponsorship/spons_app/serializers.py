@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+import uuid
 
 #------------EVENT SERIALIZERS-------------
 
@@ -40,3 +41,7 @@ class SponsorshipSerializer(serializers.ModelSerializer):
         
 class DisplayMoneySerializer(serializers.Serializer):
     id=serializers.IntegerField()
+    
+class AIGeneratorSerializer(serializers.Serializer):
+    poc_id=serializers.IntegerField()
+    

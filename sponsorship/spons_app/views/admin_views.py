@@ -33,7 +33,7 @@ class UpdateEventView(APIView):
 class DeleteEventView(APIView):
     permission_classes=[IsAuthenticated, IsAdmin]
     authentication_classes=[JWTAuthentication]
-    def post(self,request):
+    def delete(self,request):
         serializer=DeleteEventSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         event_to_delete=get_object_or_404(Event,id=serializer.data['id'])
@@ -54,7 +54,7 @@ class AddMoneyView(APIView):
                 existing_sponsorship.save()
             else:
                 serializer.save()                
-        event = Event.objects.get(pk=3)
+        event = get_object_or_404(Event,id=serializer.data['event'])
         sponsorships = event.sponsorships
         money_raised = event.money_raised
         for sponsorship in sponsorships:

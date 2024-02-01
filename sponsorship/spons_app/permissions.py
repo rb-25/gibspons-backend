@@ -5,9 +5,9 @@ class IsAdmin(BasePermission):
         return request.user.role in ['admin','owner']
     
 class IsCompanyCreator(BasePermission):
-    def has_permission(self, request, view, obj):
+    def has_object_permission(self, request, view, obj):
         return obj.user_id == request.user
     
 class IsPOCCreater(BasePermission):
-    def has_permission(self, request, view, obj):
+    def has_object_permission(self, request, view, obj):
         return obj.company.user_id == request.user

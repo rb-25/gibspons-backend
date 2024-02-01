@@ -18,6 +18,14 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
+class ChangeRoleSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    role = serializers.CharField()
+
+class DeleteUserSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+#-----------ORGANISATION SERIALIZERS--------
 class OrganisationSerializer(serializers.ModelSerializer):
     class Meta:
         model=Organisation
@@ -37,10 +45,3 @@ class OrganisationSerializer(serializers.ModelSerializer):
 
 class JoinOrganisationSerializer(serializers.Serializer):
     invite_code = serializers.CharField()
-
-class ChangeRoleSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    role = serializers.CharField()
-
-class DeleteUserSerializer(serializers.Serializer):
-    email = serializers.EmailField()

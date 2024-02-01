@@ -1,6 +1,4 @@
 from django.db import models
-
-# Create your models here.
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -8,14 +6,9 @@ from django.contrib.auth.models import AbstractUser
 class Organisation(models.Model):
     name=models.CharField(max_length=255)
     invite_code = models.CharField(max_length=8, unique=True, blank=True)
-    """def save(self, *args, **kwargs):
-        if not self.invite_code:
-            # Generate a random invite code using uuid
-            self.invite_code = str(uuid.uuid4().hex)[:8].upper()
-        super().save(*args, **kwargs)"""
     created_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
-
+    
 class User(AbstractUser):
     ROLE_CHOICES = [
         ('user', 'User'),
@@ -33,3 +26,6 @@ class User(AbstractUser):
     USERNAME_FIELD='email'
     REQUIRED_FIELDS=[]
     objects = models.Manager()
+    
+
+    

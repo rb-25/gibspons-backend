@@ -1,17 +1,17 @@
 from django.urls import path
-from spons_app.views.admin_views import *
-from spons_app.views.user_views import *
+from .views.admin_views import CreateEventView, DeleteEventView, UpdateEventView,AddMoneyView
+from .views.user_views import CreateCompanyView,DeleteCompanyView,UpdateCompanyView,CreatePOCView,DeletePOCView,UpdatePOCView,DisplaySponsorsView
 
-urlpatterns = [
-    path('createevent/', CreateEventView.as_view()),
-    path('deleteevent/',DeleteEventView.as_view()),
-    path('updateevent/<int:event_id>/',UpdateEventView.as_view()),
-    path('createcompany/', CreateCompanyView.as_view()),
-    path('deletecompany/',DeleteCompanyView.as_view()),
-    path('updatecompany/<int:company_id>/',UpdateCompanyView.as_view()),
-    path('createpoc/', CreatePOCView.as_view()),
-    path('deletepoc/',DeletePOCView.as_view()),
-    path('updatepoc/<int:POC_id>/',UpdatePOCView.as_view()),
+urlpatterns = [    
+    path('event/create/', CreateEventView.as_view()),
+    path('event/delete/',DeleteEventView.as_view()),
+    path('event/update/<int:event_id>/',UpdateEventView.as_view()),
+    path('company/create/', CreateCompanyView.as_view()),
+    path('company/delete/',DeleteCompanyView.as_view()),
+    path('company/update/<int:company_id>/',UpdateCompanyView.as_view()),
+    path('poc/create/', CreatePOCView.as_view()),
+    path('poc/delete/',DeletePOCView.as_view()),
+    path('poc/update/<int:POC_id>/',UpdatePOCView.as_view()),
     path('addmoney/',AddMoneyView.as_view()),
-    path('displaymoney/',DisplayMoney.as_view())
+    path('sponsors/display',DisplaySponsorsView.as_view())
 ]

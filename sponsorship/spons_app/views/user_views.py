@@ -9,6 +9,10 @@ from rest_framework import status
 from ..serializers import *
 from ..permissions import *
 
+#to do: change status, assign contacted status as defualt
+#display views for everything
+#
+
 #-----------CRUD COMPANY-----------------------
 
 class CreateCompanyView(APIView):
@@ -39,7 +43,7 @@ class UpdateCompanyView(APIView):
 class DeleteCompanyView(APIView):
     permission_classes=[IsAuthenticated,IsCompanyCreator]
     authentication_classes=[JWTAuthentication]
-    def post(self,request):
+    def delete(self,request):
         serializer=DeleteCompanySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         company_to_delete=get_object_or_404(Company,id=serializer.data['id'])
@@ -82,7 +86,7 @@ class UpdatePOCView(APIView):
 class DeletePOCView(APIView):
     permission_classes=[IsAuthenticated,IsPOCCreater]
     authentication_classes=[JWTAuthentication]
-    def post(self,request):
+    def delete(self,request):
         serializer=DeletePOCSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         POC_to_delete=get_object_or_404(POC,id=serializer.data['id'])
@@ -92,7 +96,7 @@ class DeletePOCView(APIView):
         return Response({'message': 'POC deleted successfully'}, status=status.HTTP_200_OK)
     
 
-class DisplayMoney(APIView):
+class DisplaySponsorsView(APIView):
     def post(self, request):
         serializer=DisplayMoneySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

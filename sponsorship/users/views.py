@@ -8,11 +8,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import status
-from .serializers import *
+from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationSerializer,ChangeRoleSerializer,DeleteUserSerializer
 from .models import User, Organisation
 import jwt,datetime
 from .permissions import IsAdmin, IsOwner
 #check if i have to send otp for verification
+
 class UserRegisterView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
@@ -92,8 +93,19 @@ class LogoutView(APIView):
         }
         return response
 
-#im returning the invite code, should i make organisation name unique?
-#have to make sure invite code is unique?
+class UpdateUserView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
+    def patch(self,request,POC_id):
+        user=get_object_or_404(User,id=request.user)
+        serializer= UserSerializer(user,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+#-----------ORGANISATIONS VIEWS---------------
+
 class CreateOrganisationView(APIView):    
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
@@ -141,7 +153,7 @@ class ChangeRoleView(APIView):
         serializer.is_valid(raise_exception=True)
         serialized_data=serializer.data
         print(serialized_data)
-        user_to_change = get_object_or_404(User,email=serialized_data['email'])
+        user_to_change = get_object_or_404(User,id=serialized_data['id'])
 
         # Change the role
         user_to_change.role = serializer.data['role'].lower()
@@ -154,11 +166,11 @@ class DeleteUserView(APIView):
     permission_classes = [IsAuthenticated,IsAdmin]
     authentication_classes=[JWTAuthentication]
 
-    def post(self, request):
+    def delete(self, request):
         serializer = DeleteUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # Check if the user to delete exists
-        user_to_delete = get_object_or_404(User,email=serializer.data['email'])
+        user_to_delete = get_object_or_404(User,id=serializer.data['id'])
 
         # Check if the user to delete has a 'user' role or lower (prevent deleting higher roles)
         #if user_to_delete.role in ['owner'] and role!= 'owner':
