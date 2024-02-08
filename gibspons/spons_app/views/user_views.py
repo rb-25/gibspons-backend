@@ -7,12 +7,14 @@ from rest_framework import status
 from users.models import User
 from spons_app.models import Event,Company, POC
 from spons_app.serializers import POCSerializer, CompanySerializer, EventSerializer, SponsorshipSerializer
-from spons_app.permissions import IsCompanyCreator, IsPOCCreater
+from spons_app.permissions import IsCompanyCreator, IsPOCCreater,IsApproved
 
 #---------------EVENT DISPLAY-------------------
 
 class DisplayEventView(APIView):
-    @staticmethod
+    permission_classes = [IsAuthenticated,IsApproved]
+    authentication_classes=[JWTAuthentication]
+
     def get(request):
         organisation_id = request.query_params.get('org')
         if organisation_id is None:
@@ -24,7 +26,7 @@ class DisplayEventView(APIView):
 #-----------CRUD COMPANY-----------------------
 
 class CreateDisplayCompanyView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
     
     @staticmethod
@@ -52,7 +54,7 @@ class CreateDisplayCompanyView(APIView):
     
     
 class UpdateDeleteCompanyView(APIView):
-    permission_classes=[IsAuthenticated,IsCompanyCreator]
+    permission_classes=[IsAuthenticated,IsCompanyCreator,IsApproved]
     authentication_classes=[JWTAuthentication]
 
     @staticmethod
@@ -83,8 +85,9 @@ class UpdateDeleteCompanyView(APIView):
 #------------CRUD POC----------------
 
 class CreateDisplayPOCView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
+    
     def post(self,request):
         serializer = POCSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -113,8 +116,9 @@ class CreateDisplayPOCView(APIView):
         return Response(poc_serializer.data, status=status.HTTP_200_OK)
 
 class UpdateDeletePOCView(APIView):
-    permission_classes=[IsAuthenticated,IsPOCCreater]
+    permission_classes=[IsAuthenticated,IsPOCCreater,IsApproved]
     authentication_classes=[JWTAuthentication]
+    
     @staticmethod
     def patch(request,POC_id):
         poc=get_object_or_404(POC,id=POC_id)
@@ -138,6 +142,9 @@ class UpdateDeletePOCView(APIView):
     
 #sponsorship for a particular event
 class DisplaySponsorsEventView(APIView):
+    permission_classes = [IsAuthenticated,IsApproved]
+    authentication_classes=[JWTAuthentication]
+    
     def get(self, request):
         event_id = request.query_params.get('event')
         if event_id is None:
@@ -154,7 +161,5 @@ class DisplaySponsorsEventView(APIView):
             "sponsorships": sponsorship_serializer.data,
             "total_money_raised": total_money_raised
         })
-
-#total sponsors     
 
 

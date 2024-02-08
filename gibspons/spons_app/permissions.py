@@ -11,3 +11,7 @@ class IsCompanyCreator(BasePermission):
 class IsPOCCreater(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.company.user_id == request.user
+
+class IsApproved(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_approved == True

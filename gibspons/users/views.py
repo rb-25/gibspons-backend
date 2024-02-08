@@ -11,7 +11,7 @@ from rest_framework import status
 from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationSerializer,ChangeRoleSerializer
 from .models import User, Organisation
 import jwt,datetime
-from .permissions import IsAdmin, IsOwner
+from .permissions import IsAdmin, IsOwner, IsApproved
 #check if i have to send otp for verification
 
 class UserRegisterView(APIView):
@@ -75,7 +75,7 @@ class LogoutView(APIView):
         return response
 
 class UpdateDisplayUserView(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
     
     @staticmethod
@@ -93,13 +93,13 @@ class UpdateDisplayUserView(APIView):
     def get(request):
         organisation_id = request.query_params.get('org')
         if organisation_id is None:
-            return Response({'detail': 'Company ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Organisation ID is required'}, status=status.HTTP_400_BAD_REQUEST)
         users=User.objects.filter(organisation=organisation_id)
         user_serializer = UserSerializer(users, many=True)
         return Response(user_serializer.data, status=status.HTTP_200_OK)
     
 class DeleteUserView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
     def delete(self, request,user_id):
         user_to_delete=get_object_or_404(User,id=user_id)
@@ -107,8 +107,33 @@ class DeleteUserView(APIView):
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
         user_to_delete.delete()
         return Response({'message': 'POC deleted successfully'}, status=status.HTTP_200_OK)
+#allowing only owner to assign admins
+class ChangeRoleView(APIView):
+    permission_classes = [IsAuthenticated, IsOwner,IsApproved]
+    authentication_classes=[JWTAuthentication]
 
-    
+    def post(self, request):
+        serializer = ChangeRoleSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_to_change = get_object_or_404(User,id=serializer.validated_data['id'])
+        user_to_change.role = serializer.data['role'].lower()
+        user_to_change.save()          
+
+        return Response({'message': 'Role changed successfully'}, status=status.HTTP_200_OK)
+
+class ApproveView(APIView):
+    permission_classes = [IsAuthenticated,IsAdmin]
+    authentication_classes=[JWTAuthentication]
+    def post(self,request):
+        user_id = request.query_params.get('user')
+        if user_id is None:
+            return Response({'detail': 'User ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        user=get_object_or_404(User,id=user_id)
+        user.is_approved=True
+        user.organisation_id=request.user.organisation.id
+        user.save()
+        return Response({'detail':'User approved'},status=status.HTTP_200_OK)
+        
 #-----------ORGANISATIONS VIEWS---------------
 
 class CreateOrganisationView(APIView):    
@@ -123,8 +148,8 @@ class CreateOrganisationView(APIView):
         serializer.is_valid(raise_exception=True)
         organisation= serializer.save()        
         user=request.user
-        user.organisation_id=organisation.id
         user.role='owner'
+        user.is_approved=True
         user.save()       
         return Response(serializer.data)
 
@@ -144,28 +169,11 @@ class JoinOrganisationView(APIView):
             user.role='user'
             user.save()
 
-            return Response({'message': 'User joined the organisation successfully.'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Waiting for approval'}, status=status.HTTP_200_OK)
 
         return Response({'message': 'Validation error', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-#allowing only owner to assign admins
-class ChangeRoleView(APIView):
-    permission_classes = [IsAuthenticated, IsOwner]
-    authentication_classes=[JWTAuthentication]
 
-    def post(self, request):
-        serializer = ChangeRoleSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serialized_data=serializer.data
-        print(serialized_data)
-        user_to_change = get_object_or_404(User,id=serialized_data['id'])
 
-        # Change the role
-        user_to_change.role = serializer.data['role'].lower()
-        user_to_change.save()
-
-        return Response({'message': 'Role changed successfully'}, status=status.HTTP_200_OK)
-
-#im allowing all admins and owners to delete users
 
     

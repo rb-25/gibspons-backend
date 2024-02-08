@@ -8,11 +8,11 @@ from users.models import User
 from spons_app.models import Event,Sponsorship
 from users.models import User
 from spons_app.serializers import EventSerializer,SponsorshipSerializer
-from spons_app.permissions import IsAdmin
+from spons_app.permissions import IsAdmin,IsApproved
 
 #-------------CRUD EVENT-----------------
 class CreateEventView(APIView):
-    permission_classes = [IsAuthenticated,IsAdmin]
+    permission_classes = [IsAuthenticated,IsAdmin,IsApproved]
     authentication_classes=[JWTAuthentication]
     def post(self,request):
         user = request.user.id
@@ -24,7 +24,7 @@ class CreateEventView(APIView):
         return Response(serializer.data)
 
 class UpdateDeleteEventView(APIView):
-    permission_classes=[IsAuthenticated,IsAdmin]
+    permission_classes=[IsAuthenticated,IsAdmin,IsApproved]
     authentication_classes=[JWTAuthentication]
     def patch(self,request,event_id):
         event=get_object_or_404(Event,id=event_id)
@@ -42,7 +42,7 @@ class UpdateDeleteEventView(APIView):
 
 #----------Adding money--------------
 class AddSponsorView(APIView):
-    permission_classes=[IsAuthenticated,IsAdmin]
+    permission_classes=[IsAuthenticated,IsAdmin,IsApproved]
     authentication_classes=[JWTAuthentication]
     def post(self,request):
         serializer=SponsorshipSerializer(data=request.data)

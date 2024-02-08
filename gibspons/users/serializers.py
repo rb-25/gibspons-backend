@@ -5,7 +5,7 @@ import uuid
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
-        fields=['id','name','email','username','password','organisation']
+        fields=['id','name','email','username','password','organisation','role']
         extra_kwargs = {
             'password' : {'write_only': True}
         }
@@ -21,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ChangeRoleSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     role = serializers.CharField()
+    is_approved=serializers.BooleanField()
 
 #-----------ORGANISATION SERIALIZERS--------
 class OrganisationSerializer(serializers.ModelSerializer):
