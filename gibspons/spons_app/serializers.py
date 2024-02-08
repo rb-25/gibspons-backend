@@ -9,7 +9,6 @@ class EventSerializer(serializers.ModelSerializer):
         model=Event
         fields=['id','name','date_of_event', 'expected_reg', 'description','brochure','logo']
 
-
     
 #--------------COMPANY SERIALIZERS -----------------
         
@@ -20,7 +19,8 @@ class CompanySerializer(serializers.ModelSerializer):
         
 
 
-#---------POC SERIALIZERS ------------
+#--------------POC SERIALIZERS ------------------
+
 class POCSerializer(serializers.ModelSerializer):
     class Meta:
         model=POC
@@ -28,16 +28,19 @@ class POCSerializer(serializers.ModelSerializer):
 
 
 #-----------SPONSORSHIP SERIALIZERS-------------
+
 class SponsorshipSerializer(serializers.ModelSerializer):
     class Meta:
         model=Sponsorship
         fields=['id','company','event','type_of_sponsorship','money_donated','additional']
 
-    
+#---------AI SERIALIZER-------------------------
+
 class AIGeneratorSerializer(serializers.Serializer):
     poc_id=serializers.IntegerField()
     event_id=serializers.IntegerField()
 
+#--------LEADERBOARD SERIALIZER-------------------
 class LeaderboardSerializer(serializers.Serializer):
     user=serializers.CharField()
     points=serializers.IntegerField()

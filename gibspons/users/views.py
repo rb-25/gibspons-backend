@@ -6,15 +6,15 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import status
 from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationSerializer,ChangeRoleSerializer
 from .models import User, Organisation
-import jwt,datetime
 from .permissions import IsAdmin, IsOwner, IsApproved
-#check if i have to send otp for verification
 
-class UserRegisterView(APIView):
+
+#---------------AUTH VIEWS---------------------
+
+class RegisterView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         serializer=UserSerializer(data=request.data)
@@ -74,6 +74,8 @@ class LogoutView(APIView):
         }
         return response
 
+#---------------USER VIEWS---------------
+
 class UpdateDisplayUserView(APIView):
     permission_classes=[IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
@@ -107,6 +109,9 @@ class DeleteUserView(APIView):
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
         user_to_delete.delete()
         return Response({'message': 'POC deleted successfully'}, status=status.HTTP_200_OK)
+
+#--------------ADMIN VIEWS--------------------
+
 #allowing only owner to assign admins
 class ChangeRoleView(APIView):
     permission_classes = [IsAuthenticated, IsOwner,IsApproved]

@@ -1,7 +1,5 @@
 from django.db import models
-
-
-    
+   
 class Company(models.Model):
     STATUS_CHOICES = [
         ('No Reply', 'No Reply'),
@@ -48,7 +46,6 @@ class Event(models.Model):
     brochure=models.URLField(blank=True,null=True)
     description=models.CharField(max_length=500,null=True)
     logo=models.URLField(null=True, max_length=None)
-    #money_raised=models.IntegerField(blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
     

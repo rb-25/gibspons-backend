@@ -1,6 +1,4 @@
-from django.shortcuts import get_object_or_404
-from django.db.models import  Sum,Count
-from django.core.serializers import serialize
+from django.db.models import  Count
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -12,6 +10,8 @@ from spons_app.serializers import LeaderboardSerializer
 
 
 class LeaderboardView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
     def get(self,request):
         organisation_id = request.query_params.get('org')
         leaderboard_data = User.objects.filter(organisation=organisation_id).order_by('-points')
@@ -19,6 +19,8 @@ class LeaderboardView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class StatusPieChartView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
     def get(self,request):
         organisation_id = request.query_params.get('org')
         data = Company.objects.filter(organisation=organisation_id).values('status').annotate(count=Count('id'))

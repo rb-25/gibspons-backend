@@ -2,8 +2,10 @@ from django.urls import path
 from .views.admin_views import CreateEventView, UpdateDeleteEventView,AddSponsorView
 from .views.user_views import CreateDisplayCompanyView,UpdateDeleteCompanyView,CreateDisplayPOCView,UpdateDeletePOCView,DisplaySponsorsEventView,DisplayEventView
 from .views.leaderboard_views import LeaderboardView,StatusPieChartView
-#add query parameteres
+
+
 urlpatterns = [
+    
     path('event/display/',DisplayEventView.as_view(), name='display_event'),    
     path('event/', CreateEventView.as_view(), name='create_event'),
     path('event/<int:event_id>/',UpdateDeleteEventView.as_view(), name='update_delete_event'), 

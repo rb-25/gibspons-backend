@@ -11,6 +11,7 @@ from spons_app.serializers import EventSerializer,SponsorshipSerializer
 from spons_app.permissions import IsAdmin,IsApproved
 
 #-------------CRUD EVENT-----------------
+
 class CreateEventView(APIView):
     permission_classes = [IsAuthenticated,IsAdmin,IsApproved]
     authentication_classes=[JWTAuthentication]
@@ -34,13 +35,14 @@ class UpdateDeleteEventView(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(request,event_id):
+    def delete(self,request,event_id):
         event_to_delete=get_object_or_404(Event,id=event_id)
         event_to_delete.delete()
         return Response({'message': 'Event deleted successfully'}, status=status.HTTP_200_OK)
 
 
-#----------Adding money--------------
+#----------ADDING SPONSORS--------------
+
 class AddSponsorView(APIView):
     permission_classes=[IsAuthenticated,IsAdmin,IsApproved]
     authentication_classes=[JWTAuthentication]

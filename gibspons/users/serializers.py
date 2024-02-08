@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import User,Organisation
 import uuid
 
+#-------------USER SERIALIZERS-------------------
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
@@ -24,6 +26,7 @@ class ChangeRoleSerializer(serializers.Serializer):
     is_approved=serializers.BooleanField()
 
 #-----------ORGANISATION SERIALIZERS--------
+
 class OrganisationSerializer(serializers.ModelSerializer):
     class Meta:
         model=Organisation
