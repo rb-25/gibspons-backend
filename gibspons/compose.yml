@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    container_name: gibspons-postgres
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+    networks:
+      - gibspons-network
+  
+  gibspons-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gibspons-api
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/usr/src/gibspons/
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - gibspons-network
+      
+volumes:
+  postgres-db:
+
+networks:
+  gibspons-network:
