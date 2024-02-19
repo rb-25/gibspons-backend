@@ -39,9 +39,10 @@ class SponsorshipSerializer(serializers.ModelSerializer):
 class AIGeneratorSerializer(serializers.Serializer):
     poc_id=serializers.IntegerField()
     event_id=serializers.IntegerField()
+    additional=serializers.CharField()
 
 #--------LEADERBOARD SERIALIZER-------------------
 class LeaderboardSerializer(serializers.Serializer):
-    user=serializers.CharField()
+    username=serializers.CharField()
     points=serializers.IntegerField()
     
