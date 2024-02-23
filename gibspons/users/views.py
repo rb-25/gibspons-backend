@@ -7,7 +7,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
-from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationSerializer,ChangeRoleSerializer
+from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationSerializer,ChangeRoleSerializer,LoginSerializer
 from .models import User, Organisation
 from .permissions import IsAdmin, IsOwner, IsApproved
 
@@ -52,14 +52,19 @@ class LoginView(APIView):
         refresh_token = RefreshToken.for_user(user)
 
         serializer = UserSerializer(user)
+        print("Serializer Data:", serializer.data)
         serializer.access_token = refresh_token.access_token
         serializer.refresh_token = str(refresh_token)
-
+        
+        response={}
+        for key in serializer.data:
+            response[key]=serializer.data[key]
+        response["access_token"]=str(refresh_token.access_token)
+        response["refresh_token"]=str(refresh_token)
         return Response(
             {
-                "data": serializer.data,
-                "access_token": str(refresh_token.access_token),
-                "refresh_token": str(refresh_token),
+                "data":response
+                
             },
             status=HTTPStatus.OK,
         )

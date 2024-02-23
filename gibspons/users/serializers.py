@@ -19,6 +19,12 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+class LoginSerializer(UserSerializer):
+    access_token = serializers.CharField(max_length=255)
+    refresh_token = serializers.CharField(max_length=255)
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ['access_token', 'refresh_token']
     
 class ChangeRoleSerializer(serializers.Serializer):
     id = serializers.IntegerField()
