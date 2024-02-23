@@ -7,7 +7,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
-from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationSerializer,ChangeRoleSerializer,LoginSerializer
+from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationSerializer,ChangeRoleSerializer
 from .models import User, Organisation
 from .permissions import IsAdmin, IsOwner, IsApproved
 
