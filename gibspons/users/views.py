@@ -33,14 +33,26 @@ class LoginView(APIView):
     def post(request):
         email = request.data.get("email")
         password = request.data.get("password")
+        username= request.data.get("username")
+        
+        if not username:
+            if not email or not password:
+                return Response(
+                    {"detail": "Email and password are required."},
+                    status=HTTPStatus.BAD_REQUEST,
+                )
 
-        if not email or not password:
-            return Response(
-                {"detail": "Email and password are required."},
-                status=HTTPStatus.BAD_REQUEST,
-            )
+            user = get_object_or_404(User, email=email)
+        elif not email:
+            if not username or not password:
+                return Response(
+                    {"detail": "Username and password are required."},
+                    status=HTTPStatus.BAD_REQUEST,
+                )
 
-        user = get_object_or_404(User, email=email)
+            user = get_object_or_404(User, username=username)
+        else:
+            user=get_object_or_404(User,email=email)
 
         if not user.check_password(password):
             return Response(

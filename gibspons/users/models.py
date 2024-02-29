@@ -19,7 +19,7 @@ class User(AbstractUser):
     ]
     is_approved=models.BooleanField(default=False)
     name=models.CharField(max_length=254)
-    username= models.CharField(max_length=254)
+    username= models.CharField(max_length=254, unique=True)
     email=models.EmailField(max_length=254, unique=True)    
     password=models.CharField(max_length=255)
     organisation=models.ForeignKey('Organisation', on_delete=models.CASCADE,null=True,blank=True)
