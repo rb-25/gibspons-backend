@@ -11,7 +11,10 @@ from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationS
 from .models import User, Organisation
 from .permissions import IsAdmin, IsOwner, IsApproved
 
-
+class CheckView(APIView):
+    permission_classes=[AllowAny]
+    def get(self,request):
+        return Response ({"message":"hi we're online"})
 #---------------AUTH VIEWS---------------------
 
 class RegisterView(APIView):

@@ -28,6 +28,7 @@ services:
       - postgres
     networks:
       - gibspons-network
+    restart: always
     
   traefik:
     build:
@@ -44,6 +45,7 @@ services:
       - "0.0.0.0:5555:5555"
     networks:
       - gibspons-network
+    restart: always
       
 volumes:
   postgres-db:

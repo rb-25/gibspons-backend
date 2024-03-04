@@ -1,8 +1,9 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import RegisterView,LoginView,LogoutView,CreateOrganisationView,JoinOrganisationView,DeleteUserView,ChangeRoleView,UpdateDisplayUserView,ApproveView
+from .views import RegisterView,LoginView,LogoutView,CreateOrganisationView,JoinOrganisationView,DeleteUserView,ChangeRoleView,UpdateDisplayUserView,ApproveView, CheckView
 
 urlpatterns = [
+    path('check', CheckView.as_view(),name="check"),
     path('register/', RegisterView.as_view(),name="register"),
     path('login/', LoginView.as_view(),name="login"),
     path('logout/', LogoutView.as_view(),name="logout"),    
