@@ -26,10 +26,9 @@ class User(AbstractUser):
     role=models.CharField(max_length=20, null=True, choices=ROLE_CHOICES)
     points=models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-        
-    USERNAME_FIELD='email'
+    
     REQUIRED_FIELDS=[]
-    objects = models.Manager()
+    
     
 
     
