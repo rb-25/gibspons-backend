@@ -65,6 +65,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sponsorship.wsgi.application'
 
 
+CSRF_TRUSTED_ORIGINS =['https://*gibspons.dscvit.com','https://localhost','https://127.0.0.1']
+CSRF_COOKIE_SECURE = True
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
