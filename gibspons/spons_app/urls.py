@@ -1,6 +1,6 @@
 from django.urls import path
 from .views.admin_views import CreateEventView, UpdateDeleteEventView,AddSponsorView
-from .views.user_views import CreateDisplayCompanyView,UpdateDeleteCompanyView,CreateDisplayPOCView,UpdateDeletePOCView,DisplaySponsorsEventView,DisplayEventView
+from .views.user_views import CreateDisplayCompanyView,UpdateDeleteCompanyView,CreateDisplayPOCView,UpdateDeletePOCView,DisplaySponsorsEventView,DisplayEventView, DisplayUserCompanyView
 from .views.leaderboard_views import LeaderboardView,StatusPieChartView
 from .views.ai_views import EmailGeneratorView,LinkedInGeneratorView
 
@@ -16,6 +16,7 @@ urlpatterns = [
     path('poc/<int:POC_id>/',UpdateDeletePOCView.as_view(), name='update_delete_poc'),   
     path('addsponsor/',AddSponsorView.as_view()),
     path('sponsors/',DisplaySponsorsEventView.as_view(), name='display_sponsor_event'),
+    path('usercompany/',DisplayUserCompanyView.as_view(), name='display_user_sponsors'),
     path('leaderboard/',LeaderboardView.as_view(),name="leaderboard"),
     path('piechart/',StatusPieChartView.as_view(),name="status_pie_chart"),
     path('generateemail/',EmailGeneratorView.as_view(),name="generate_email"),

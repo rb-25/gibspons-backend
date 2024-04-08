@@ -5,7 +5,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from users.models import User
-from spons_app.models import Event,Company, POC
+from spons_app.models import Event,Company, POC, Sponsorship
 from spons_app.serializers import POCSerializer, CompanySerializer, EventSerializer, SponsorshipSerializer
 from spons_app.permissions import IsCompanyCreator, IsPOCCreater,IsApproved
 
@@ -80,7 +80,17 @@ class UpdateDeleteCompanyView(APIView):
         company_to_delete.delete()
         return Response({'message': 'Company deleted successfully'}, status=status.HTTP_200_OK)
 
-
+class DisplayUserCompanyView(APIView):
+    permission_classes = [IsAuthenticated,IsApproved]
+    authentication_classes=[JWTAuthentication]
+    
+    def get(self, request):
+        user_id = request.user.id
+        companies = Company.objects.filter(user_id=user_id)
+        if not companies:
+            return Response({'detail': 'No companies found for the given organization ID'}, status=status.HTTP_404_NOT_FOUND)
+        company_serializer = CompanySerializer(companies, many=True)
+        return Response(company_serializer.data, status=status.HTTP_200_OK)
     
 #------------CRUD POC----------------
 

@@ -113,13 +113,21 @@ class UpdateDisplayUserView(APIView):
     
     @staticmethod
     def get(request):
+        users=User.objects.filter(id=request.user.id)
+        user_serializer = UserSerializer(users, many=True)
+        return Response(user_serializer.data, status=status.HTTP_200_OK)
+
+class DisplayAllUsersView(APIView):
+    permission_classes=[IsAuthenticated,IsApproved,IsAdmin]
+    authentication_classes=[JWTAuthentication]
+    def get(self, request):
         organisation_id = request.query_params.get('org')
         if organisation_id is None:
             return Response({'detail': 'Organisation ID is required'}, status=status.HTTP_400_BAD_REQUEST)
         users=User.objects.filter(organisation=organisation_id)
         user_serializer = UserSerializer(users, many=True)
         return Response(user_serializer.data, status=status.HTTP_200_OK)
-    
+      
 class DeleteUserView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
@@ -175,7 +183,8 @@ class CreateOrganisationView(APIView):
         user=request.user
         user.role='owner'
         user.is_approved=True
-        user.save()       
+        user.organisation=organisation
+        user.save()               
         return Response(serializer.data)
 
 class JoinOrganisationView(APIView):
