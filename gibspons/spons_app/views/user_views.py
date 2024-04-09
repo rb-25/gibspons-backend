@@ -4,11 +4,25 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from users.models import User
+from users.models import User,Organisation
 from spons_app.models import Event,Company, POC, Sponsorship
+from users.serializers import OrganisationSerializer
 from spons_app.serializers import POCSerializer, CompanySerializer, EventSerializer, SponsorshipSerializer
 from spons_app.permissions import IsCompanyCreator, IsPOCCreater,IsApproved
 
+
+#---------------ORGANISATION DISPLAY------------
+
+class DisplayOrganisationView(APIView):
+    permission_classes = [IsAuthenticated,IsApproved]
+    authentication_classes=[JWTAuthentication]
+
+    def get(self,request):
+        organisation_id = request.user.organisation_id
+        organisation=get_object_or_404(Organisation,id=organisation_id)
+        organisation_serializer = OrganisationSerializer(organisation)
+        return Response(organisation_serializer.data, status=status.HTTP_200_OK)
+    
 #---------------EVENT DISPLAY-------------------
 
 class DisplayEventView(APIView):

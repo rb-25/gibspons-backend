@@ -30,7 +30,7 @@ class ChangeRoleSerializer(serializers.Serializer):
 class OrganisationSerializer(serializers.ModelSerializer):
     class Meta:
         model=Organisation
-        fields=['id','name','industry','location','invite_code']
+        fields=['id','name','industry','location','invite_code','logo']
         extra_kwargs = {
             'name': {'required': False},
             'invite_code': {'validators': []},  # Disable default uniqueness validator
