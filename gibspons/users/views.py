@@ -97,7 +97,7 @@ class LogoutView(APIView):
 #---------------USER VIEWS---------------
 
 class UpdateDisplayUserView(APIView):
-    permission_classes=[IsAuthenticated,IsApproved]
+    permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     
     @staticmethod
@@ -118,7 +118,7 @@ class UpdateDisplayUserView(APIView):
         return Response(user_serializer.data, status=status.HTTP_200_OK)
 
 class DisplayAllUsersView(APIView):
-    permission_classes=[IsAuthenticated,IsApproved,IsAdmin]
+    permission_classes=[IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
     def get(self, request):
         organisation_id = request.query_params.get('org')

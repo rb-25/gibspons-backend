@@ -14,7 +14,7 @@ from spons_app.permissions import IsCompanyCreator, IsPOCCreater,IsApproved
 #---------------ORGANISATION DISPLAY------------
 
 class DisplayOrganisationView(APIView):
-    permission_classes = [IsAuthenticated,IsApproved]
+    permission_classes = [IsAuthenticated]
     authentication_classes=[JWTAuthentication]
 
     def get(self,request):
