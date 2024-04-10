@@ -15,24 +15,36 @@ class EventSerializer(serializers.ModelSerializer):
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model=Company
-        fields=['id','name','website','industry','linkedin','status']
+        fields=['id','name','website','industry','linkedin','status','event']
         
 
 
 #--------------POC SERIALIZERS ------------------
 
 class POCSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source='company.name',required=False)
     class Meta:
         model=POC
-        fields=['id','name','designation','company','email','linkedin','phone']
+        fields=['id','name','designation','company','company_name','email','linkedin','phone']
 
 
+class POCCompanySerializer(serializers.ModelSerializer):
+    updated_at = serializers.DateField(source='company.updated_at')
+    company_name = serializers.CharField(source='company.name')  
+    name = serializers.CharField()
+    added_by = serializers.CharField(source='company.user_id.username')
+    status = serializers.CharField(source='company.status')  
+
+    class Meta:
+        model = POC
+        fields = ['updated_at','company_name', 'name', 'added_by', 'status']
 #-----------SPONSORSHIP SERIALIZERS-------------
 
 class SponsorshipSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source='company.name')
     class Meta:
         model=Sponsorship
-        fields=['id','company','event','type_of_sponsorship','money_donated','additional']
+        fields=['id','company','company_name','event','type_of_sponsorship','money_donated','additional']
 
 #---------AI SERIALIZER-------------------------
 

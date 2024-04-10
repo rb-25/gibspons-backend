@@ -14,6 +14,7 @@ class Company(models.Model):
     status=models.CharField(max_length=20,default="No Reply", choices=STATUS_CHOICES)
     user_id=models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
     organisation=models.ForeignKey('users.Organisation',on_delete=models.CASCADE)
+    event = models.ForeignKey('Event', on_delete=models.CASCADE, null=True)
     updated_at=models.DateField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
     unique_together = ['name', 'website']

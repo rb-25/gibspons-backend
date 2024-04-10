@@ -7,7 +7,7 @@ from rest_framework import status
 from users.models import User,Organisation
 from spons_app.models import Event,Company, POC, Sponsorship
 from users.serializers import OrganisationSerializer
-from spons_app.serializers import POCSerializer, CompanySerializer, EventSerializer, SponsorshipSerializer
+from spons_app.serializers import POCSerializer, CompanySerializer, EventSerializer, SponsorshipSerializer, POCCompanySerializer
 from spons_app.permissions import IsCompanyCreator, IsPOCCreater,IsApproved
 
 
@@ -29,7 +29,7 @@ class DisplayEventView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
 
-    def get(request):
+    def get(self,request):
         organisation_id = request.query_params.get('org')
         if organisation_id is None:
             return Response({'detail': 'Organization ID is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -102,10 +102,23 @@ class DisplayUserCompanyView(APIView):
         user_id = request.user.id
         companies = Company.objects.filter(user_id=user_id)
         if not companies:
-            return Response({'detail': 'No companies found for the given organization ID'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'No companies found for the given User ID'}, status=status.HTTP_404_NOT_FOUND)
         company_serializer = CompanySerializer(companies, many=True)
         return Response(company_serializer.data, status=status.HTTP_200_OK)
+
+class DisplayEventCompanyView(APIView):
+    permission_classes = [IsAuthenticated,IsApproved]
+    authentication_classes=[JWTAuthentication]
     
+    def get(self, request):
+        event_id = request.query_params.get('event')
+        if event_id is None:
+            return Response({'detail': 'Event ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        pocs = POC.objects.filter(company__event=event_id)
+        if not pocs:
+            return Response({'detail': 'No companies found for the given event ID'}, status=status.HTTP_404_NOT_FOUND)
+        poc_serializer = POCCompanySerializer(pocs, many=True)
+        return Response(poc_serializer.data, status=status.HTTP_200_OK)    
 #------------CRUD POC----------------
 
 class CreateDisplayPOCView(APIView):
