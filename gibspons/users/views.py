@@ -122,9 +122,14 @@ class DisplayAllUsersView(APIView):
     authentication_classes=[JWTAuthentication]
     def get(self, request):
         organisation_id = request.query_params.get('org')
+        if request.user.organisation_id != organisation_id:
+            return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
         if organisation_id is None:
             return Response({'detail': 'Organisation ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        users=User.objects.filter(organisation=organisation_id)
+        if request.user.role == 'admin' or request.user.role == 'owner':
+            users = User.objects.filter(organisation=organisation_id)
+        else:
+            users = User.objects.filter(organisation=organisation_id, is_approved=True)
         user_serializer = UserSerializer(users, many=True)
         return Response(user_serializer.data, status=status.HTTP_200_OK)
       
