@@ -122,7 +122,7 @@ class DisplayAllUsersView(APIView):
     authentication_classes=[JWTAuthentication]
     def get(self, request):
         organisation_id = request.query_params.get('org')
-        if request.user.organisation_id != organisation_id:
+        if int(request.user.organisation.id) != int(organisation_id):
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
         if organisation_id is None:
             return Response({'detail': 'Organisation ID is required'}, status=status.HTTP_400_BAD_REQUEST)

@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='start_date',
-            field=models.DateField(default='01-01-2024'),
+            field=models.DateField(default='2024-01-01'),
             preserve_default=False,
         ),
     ]
