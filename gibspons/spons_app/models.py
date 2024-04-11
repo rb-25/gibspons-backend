@@ -42,7 +42,8 @@ class Sponsorship(models.Model):
 class Event(models.Model):
     organisation=models.ForeignKey('users.Organisation',on_delete=models.CASCADE)
     name=models.CharField(max_length=255,unique=True)
-    date_of_event=models.DateField()
+    start_date=models.DateField()
+    end_date=models.DateField()
     expected_reg=models.IntegerField(blank=True,null=True)
     brochure=models.URLField(blank=True,null=True)
     description=models.CharField(max_length=500,null=True)

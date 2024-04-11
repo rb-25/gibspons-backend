@@ -7,7 +7,7 @@ import uuid
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model=Event
-        fields=['id','name','date_of_event', 'expected_reg', 'description','brochure','logo']
+        fields=['id','name','start_date','end_date' 'expected_reg', 'description','brochure','logo']
 
     
 #--------------COMPANY SERIALIZERS -----------------
