@@ -22,6 +22,7 @@ class Company(models.Model):
 
 class POC(models.Model):
     name=models.CharField(max_length=254)
+    event=models.ForeignKey('Event',on_delete=models.CASCADE)
     company=models.ForeignKey('Company',on_delete=models.CASCADE)
     designation=models.CharField(max_length=254)
     email=models.EmailField()

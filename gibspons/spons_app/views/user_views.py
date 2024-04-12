@@ -3,12 +3,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from users.models import User,Organisation
 from spons_app.models import Event,Company, POC, Sponsorship
 from users.serializers import OrganisationSerializer
 from spons_app.serializers import POCSerializer, CompanySerializer, EventSerializer, SponsorshipSerializer, POCCompanySerializer
-from spons_app.permissions import IsCompanyCreator, IsPOCCreater,IsApproved
+from spons_app.customs.permissions import IsCompanyCreator, IsPOCCreater,IsApproved
+from spons_app.customs.pagination import CustomPagination
 
 
 #---------------ORGANISATION DISPLAY------------
@@ -16,7 +19,7 @@ from spons_app.permissions import IsCompanyCreator, IsPOCCreater,IsApproved
 class DisplayOrganisationView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes=[JWTAuthentication]
-
+    
     def get(self,request):
         organisation_id = request.user.organisation_id
         organisation=get_object_or_404(Organisation,id=organisation_id)
@@ -28,7 +31,12 @@ class DisplayOrganisationView(APIView):
 class DisplayEventView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
-
+    pagination_class = CustomPagination
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ["name", "start_time", "end_time"]
+    search_fields = ["name"]
+    ordering_fields = ["name","start_time"]
+    ordering = ["start_time"]
     def get(self,request):
         organisation_id = request.query_params.get('org')
         if organisation_id is None:
@@ -42,7 +50,11 @@ class DisplayEventView(APIView):
 class CreateDisplayCompanyView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
-    
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ["name", "status","updated_at","user_id"]
+    search_fields = ["name","user_id","status"]
+    ordering_fields = ["name","status"]
+    ordering = ["name"]
     @staticmethod
     def get(request):
         organisation_id = request.query_params.get('org')
@@ -70,7 +82,7 @@ class CreateDisplayCompanyView(APIView):
 class UpdateDeleteCompanyView(APIView):
     permission_classes=[IsAuthenticated,IsCompanyCreator,IsApproved]
     authentication_classes=[JWTAuthentication]
-
+        
     @staticmethod
     def patch(request,company_id):
         company=get_object_or_404(Company,id=company_id)
@@ -97,6 +109,11 @@ class UpdateDeleteCompanyView(APIView):
 class DisplayUserCompanyView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ["name", "status","updated_at","user_id"]
+    search_fields = ["name","user_id","status"]
+    ordering_fields = ["name","status"]
+    ordering = ["name"]
     
     def get(self, request):
         user_id = request.user.id
@@ -109,6 +126,11 @@ class DisplayUserCompanyView(APIView):
 class DisplayEventCompanyView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ["name", "status","updated_at","user_id"]
+    search_fields = ["name","user_id","status"]
+    ordering_fields = ["name","status"]
+    ordering = ["name"]
     
     def get(self, request):
         event_id = request.query_params.get('event')
@@ -124,6 +146,11 @@ class DisplayEventCompanyView(APIView):
 class CreateDisplayPOCView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ["name","company","email","linkedin","phone","user"]
+    search_fields = ["name","company","email","linkedin","phone","user"]
+    ordering_fields = ["name","company","user"]
+    ordering = ["company"]
     
     def post(self,request):
         serializer = POCSerializer(data=request.data)
@@ -181,6 +208,11 @@ class UpdateDeletePOCView(APIView):
 class DisplaySponsorsEventView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ["money_donated","type_of_sponsorship","company.name","event"]
+    search_fields = ["company.name","type_of_sponsorship"]
+    ordering_fields = ["company.name","money_donated"]
+    ordering = ["company.name"]
     
     def get(self, request):
         event_id = request.query_params.get('event')

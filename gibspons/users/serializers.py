@@ -1,13 +1,13 @@
 from rest_framework import serializers
 from .models import User,Organisation
 import uuid
-
+from spons_app.models import Event
 #-------------USER SERIALIZERS-------------------
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
-        fields=['id','name','email','username','password','organisation','role','is_approved']
+        fields=['id','name','email','username','password','organisation','role','is_approved','created_at']
         extra_kwargs = {
             'password' : {'write_only': True}
         }
@@ -30,7 +30,7 @@ class ChangeRoleSerializer(serializers.Serializer):
 class OrganisationSerializer(serializers.ModelSerializer):
     class Meta:
         model=Organisation
-        fields=['id','name','industry','location','invite_code','logo']
+        fields=['id','name','industry','location','invite_code','logo',]
         extra_kwargs = {
             'name': {'required': False},
             'invite_code': {'validators': []},  # Disable default uniqueness validator

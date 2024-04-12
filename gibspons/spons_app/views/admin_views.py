@@ -8,7 +8,7 @@ from users.models import User
 from spons_app.models import Event,Sponsorship
 from users.models import User
 from spons_app.serializers import EventSerializer,SponsorshipSerializer
-from spons_app.permissions import IsAdmin,IsApproved
+from spons_app.customs.permissions import IsAdmin,IsApproved
 
 #-------------CRUD EVENT-----------------
 
