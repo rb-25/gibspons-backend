@@ -13,8 +13,8 @@ class EventSerializer(serializers.ModelSerializer):
 #--------------COMPANY SERIALIZERS -----------------
         
 class CompanySerializer(serializers.ModelSerializer):
-    event_name = serializers.CharField(source='event.name',required=False,readonly=True)
-    user_name = serializers.CharField(source='user.name',required=False,readonly=True) 
+    event_name = serializers.CharField(source='event.name',required=False,read_only=True)
+    user_name = serializers.CharField(source='user.name',required=False,read_only=True) 
     class Meta:
         model=Company
         fields=['id','name','website','industry','linkedin','status','event','event_name','user_id','user_name']
