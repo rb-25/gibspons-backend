@@ -13,8 +13,8 @@ class EventSerializer(serializers.ModelSerializer):
 #--------------COMPANY SERIALIZERS -----------------
         
 class CompanySerializer(serializers.ModelSerializer):
-    event_name = serializers.CharField(source='event.name',required=False)
-    user_name = serializers.CharField(source='user.name',required=False) 
+    event_name = serializers.CharField(source='event.name',required=False,readonly=True)
+    user_name = serializers.CharField(source='user.name',required=False,readonly=True) 
     class Meta:
         model=Company
         fields=['id','name','website','industry','linkedin','status','event','event_name','user_id','user_name']
@@ -24,10 +24,15 @@ class CompanySerializer(serializers.ModelSerializer):
 #--------------POC SERIALIZERS ------------------
 
 class POCSerializer(serializers.ModelSerializer):
-    company_name = serializers.CharField(source='company.name',required=False)
+    company_name = serializers.CharField(source='company.name',required=False,read_only=True)
     class Meta:
         model=POC
-        fields=['id','name','designation','company','company_name','email','linkedin','phone']
+        fields=['id','name','designation','company','company_name','email','linkedin','phone','event']
+    def create(self, validated_data):
+        validated_data.pop('user', None)
+        company = validated_data.pop('company')  
+        poc = POC.objects.create(company=company, **validated_data)  
+        return poc
 
 
 class POCCompanySerializer(serializers.ModelSerializer):

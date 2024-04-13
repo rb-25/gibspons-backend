@@ -21,10 +21,13 @@ class DisplayOrganisationView(APIView):
     authentication_classes=[JWTAuthentication]
     
     def get(self,request):
-        organisation_id = request.user.organisation_id
-        organisation=get_object_or_404(Organisation,id=organisation_id)
-        organisation_serializer = OrganisationSerializer(organisation)
-        return Response(organisation_serializer.data, status=status.HTTP_200_OK)
+        try:
+            organisation_id = request.user.organisation_id
+            organisation=Organisation.objects.get(id=organisation_id)
+            organisation_serializer = OrganisationSerializer(organisation)
+            return Response(organisation_serializer.data, status=status.HTTP_200_OK)
+        except Organisation.DoesNotExist:
+            return Response([], status=status.HTTP_200_OK)
     
 #---------------EVENT DISPLAY-------------------
 
@@ -37,14 +40,17 @@ class DisplayEventView(APIView):
     search_fields = ["name"]
     ordering_fields = ["name","start_time"]
     ordering = ["start_time"]
-    def get(self,request):
+    def get(self, request):
         organisation_id = request.query_params.get('org')
+        event_id = request.query_params.get('event')
         if organisation_id is None:
             return Response({'detail': 'Organization ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        events=Event.objects.filter(organisation=organisation_id)
+        events = Event.objects.filter(organisation=organisation_id)
+        if event_id:
+            events = events.filter(id=event_id)
         events_serializer = EventSerializer(events, many=True)
         return Response(events_serializer.data, status=status.HTTP_200_OK)
-    
+        
 #-----------CRUD COMPANY-----------------------
 
 class CreateDisplayCompanyView(APIView):
@@ -55,19 +61,19 @@ class CreateDisplayCompanyView(APIView):
     search_fields = ["name","user_id","status"]
     ordering_fields = ["name","status"]
     ordering = ["name"]
-    @staticmethod
-    def get(request):
+    
+    def get(self,request):
         organisation_id = request.query_params.get('org')
         if organisation_id is None:
             return Response({'detail': 'Organization ID is required'}, status=status.HTTP_400_BAD_REQUEST)
         companies = Company.objects.filter(organisation=organisation_id)
         if not companies:
             return Response({'detail': 'No companies found for the given organization ID'}, status=status.HTTP_404_NOT_FOUND)
+        #queryset = self.filter_queryset(companies, request)
         company_serializer = CompanySerializer(companies, many=True)
         return Response(company_serializer.data, status=status.HTTP_200_OK)
     
-    @staticmethod
-    def post(request):
+    def post(self,request):
         curr_user=request.user
         current_organization_id = curr_user.organisation 
         serializer = CompanySerializer(data=request.data)
@@ -153,20 +159,26 @@ class CreateDisplayPOCView(APIView):
     ordering = ["company"]
     
     def post(self,request):
-        serializer = POCSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        curr_user=request.user             
-        company=get_object_or_404(Company,id=serializer.validated_data['company'].id)
-        if company.user_id != curr_user:
-            return Response({'message':'You are not allowed to add POC for this company'},status=status.HTTP_403_FORBIDDEN)        
-        poc=serializer.save()
-        pocobj=get_object_or_404(POC,id=poc.id)
-        pocobj.user= request.user.id
-        pocobj.save()
-        userobj=get_object_or_404(User,id=request.user.id)
-        userobj.points+=1
-        userobj.save()
-        return Response(serializer.data)
+        poc_data_list = request.data
+        poc_objects = []
+
+        for poc_data in poc_data_list:
+            serializer = POCSerializer(data=poc_data)
+            if serializer.is_valid():
+                company = get_object_or_404(Company, id=poc_data['company'])
+                if company.user_id != request.user:
+                    print(company.user_id, request.user)
+                    return Response({'message': 'You are not allowed to add POC for this company'}, status=status.HTTP_403_FORBIDDEN)
+                
+                serializer.save(user=request.user.id)
+                poc_objects.append(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.points += len(poc_objects)
+        request.user.save()
+
+        return Response(poc_objects, status=status.HTTP_201_CREATED)
     
     @staticmethod    
     def get(request):
