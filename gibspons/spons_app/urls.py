@@ -1,8 +1,11 @@
 from django.urls import path
-from .views.admin_views import CreateEventView, UpdateDeleteEventView,AddSponsorView
-from .views.user_views import CreateDisplayCompanyView,UpdateDeleteCompanyView,CreateDisplayPOCView,UpdateDeletePOCView,DisplaySponsorsEventView,DisplayEventView, DisplayUserCompanyView, DisplayOrganisationView,DisplayEventCompanyView
+from .views.organisation import DisplayOrganisationView
+from .views.event import CreateEventView, UpdateDeleteEventView,DisplayEventView
+from .views.sponsorship import AddAcceptedView,DisplaySponsorsEventView,DisplayUserCompanyView
+from .views.company import CreateDisplayCompanyView,UpdateDeleteCompanyView
+from .views.poc import CreateDisplayPOCView,UpdateDeletePOCView
 from .views.leaderboard_views import LeaderboardView,StatusPieChartView
-from .views.ai_views import EmailGeneratorView,LinkedInGeneratorView
+from .views.ai import EmailGeneratorView,LinkedInGeneratorView
 
 
 urlpatterns = [
@@ -13,10 +16,9 @@ urlpatterns = [
     path('event/<int:event_id>/',UpdateDeleteEventView.as_view(), name='update_delete_event'), 
     path('company/', CreateDisplayCompanyView.as_view(), name='create_company'),
     path('company/<int:company_id>/',UpdateDeleteCompanyView.as_view(), name='update_delete_company'),
-    path('event/company/',DisplayEventCompanyView.as_view(), name='display_event_company'), 
     path('poc/', CreateDisplayPOCView.as_view(), name='create_display_poc'),
     path('poc/<int:POC_id>/',UpdateDeletePOCView.as_view(), name='update_delete_poc'), 
-    path('addsponsor/',AddSponsorView.as_view()),
+    path('addsponsor/',AddAcceptedView.as_view()),
     path('sponsors/',DisplaySponsorsEventView.as_view(), name='display_sponsor_event'),
     path('usercompany/',DisplayUserCompanyView.as_view(), name='display_user_sponsors'),
     path('leaderboard/',LeaderboardView.as_view(),name="leaderboard"),
