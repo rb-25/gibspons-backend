@@ -48,11 +48,20 @@ class CreateDisplayCompanyView(APIView):
         
         curr_user = request.user
         current_organization_id = curr_user.organisation
-        
-        company_serializer = CompanySerializer(data=request.data)
-        company_serializer.is_valid(raise_exception=True)
-        company = company_serializer.save(organisation=current_organization_id)
-        
+               
+        name = request.data.get('name')
+        website = request.data.get('website')
+        existing_company = Company.objects.filter(name=name, website=website).first()
+
+        if not existing_company:
+            company_serializer = CompanySerializer(data=request.data)
+            company_serializer.is_valid(raise_exception=True)
+            print("exists")
+            company = company_serializer.save(organisation=current_organization_id)
+        else:
+            company = existing_company
+            company_serializer = CompanySerializer(company)
+
         sponsorship_data = {
             'company': company.id,
             'event': request.data.get('event_id'),
