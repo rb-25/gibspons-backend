@@ -7,7 +7,7 @@ from spons_app.models import Event
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
-        fields=['id','name','email','username','password','organisation','role','is_approved','created_at']
+        fields=['id','name','email','username','password','profile_pic','organisation','role','is_approved','created_at']
         extra_kwargs = {
             'password' : {'write_only': True}
         }
