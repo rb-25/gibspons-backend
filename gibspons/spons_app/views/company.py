@@ -56,6 +56,7 @@ class CreateDisplayCompanyView(APIView):
         sponsorship_data = {
             'company': company.id,
             'event': request.data.get('event_id'),
+            'contacted_by':request.user.id,
             'status': 'Not Contacted' 
         }
         sponsorship_serializer = SponsorshipSerializer(data=sponsorship_data)

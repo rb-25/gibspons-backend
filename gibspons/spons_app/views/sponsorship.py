@@ -72,14 +72,14 @@ class DisplayUserCompanyView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
-    filterset_fields = ["name", "status","updated_at","user_id"]
-    search_fields = ["name","user_id","status"]
+    filterset_fields = ["name", "status","updated_at","contacted_by"]
+    search_fields = ["name","contacted_by","status"]
     ordering_fields = ["name","status"]
     ordering = ["name"]
     
     def get(self, request):
         user_id = request.user.id
-        sponsors = Sponsorship.objects.filter(user_id=user_id)
+        sponsors = Sponsorship.objects.filter(contacted_by=user_id)
         if not sponsors:
             return Response({'detail': 'No companies found for the given User ID'}, status=status.HTTP_404_NOT_FOUND)
         sponsor_serializer = SponsorshipSerializer(sponsors, many=True)
