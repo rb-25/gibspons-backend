@@ -38,7 +38,7 @@ class UpdateSponsorView(APIView):
 
 class DisplaySponsorsEventView(APIView):
     
-    """View to display sponsors for a particular event"""
+    """View to display sponsors for a particular organisation and event"""
     
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
@@ -49,22 +49,31 @@ class DisplaySponsorsEventView(APIView):
     ordering = ["company.name"]
     
     def get(self, request):
+        org_id = request.user.organisation.id
         event_id = request.query_params.get('event')
-        if event_id is None:
-            return Response({'detail': 'Event ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        event=get_object_or_404(Event,id=event_id)
-        sponsorships = event.sponsorships
-        total_money_raised = event.money_raised
+        if event_id is not None:
+            event=get_object_or_404(Event,id=event_id)
+            sponsorships = event.sponsorships
+            if sponsorships.count() == 0:
+                return Response({'detail': 'No sponsors found for the given Event ID'}, status=status.HTTP_404_NOT_FOUND)
+            
+            total_money_raised = event.money_raised
 
-        sponsorship_serializer = SponsorshipSerializer(sponsorships, many=True)
-        event_serializer = EventSerializer(event)
+            sponsorship_serializer = SponsorshipSerializer(sponsorships, many=True)
+            event_serializer = EventSerializer(event)
 
-        return Response({
+            return Response({
             "event": event_serializer.data,
             "sponsorships": sponsorship_serializer.data,
             "total_money_raised": total_money_raised
-        })
-
+            })
+        else:
+            sponsor= Sponsorship.objects.filter(company__organisation=org_id)
+            if not sponsor:
+                return Response({'detail': 'No sponsors found for the given Organisation ID'}, status=status.HTTP_404_NOT_FOUND)    
+            sponsor_serializer = SponsorshipSerializer(sponsor, many=True)
+            return Response(sponsor_serializer.data, status=status.HTTP_200_OK)
+        
 class DisplayUserCompanyView(APIView):
     
     """View to display companies for a particular user"""

@@ -22,6 +22,7 @@ class User(AbstractUser):
     username= models.CharField(max_length=254, unique=True)
     email=models.EmailField(max_length=254, unique=True)    
     password=models.CharField(max_length=255)
+    profile_pic=models.URLField(null=True)
     organisation=models.ForeignKey('Organisation', on_delete=models.CASCADE,null=True,blank=True)
     role=models.CharField(max_length=20, null=True, choices=ROLE_CHOICES)
     points=models.IntegerField(default=0)
