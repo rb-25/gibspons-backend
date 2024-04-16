@@ -1,7 +1,7 @@
 from django.urls import path
 from .views.organisation import DisplayOrganisationView
 from .views.event import CreateEventView, UpdateDeleteEventView,DisplayEventView
-from .views.sponsorship import AddAcceptedView,DisplaySponsorsEventView,DisplayUserCompanyView
+from .views.sponsorship import AddAcceptedView,DisplaySponsorsEventView,DisplayUserCompanyView,UpdateSponsorView
 from .views.company import CreateDisplayCompanyView,UpdateDeleteCompanyView
 from .views.poc import CreateDisplayPOCView,UpdateDeletePOCView
 from .views.leaderboard_views import LeaderboardView,StatusPieChartView
@@ -20,6 +20,7 @@ urlpatterns = [
     path('poc/<int:POC_id>/',UpdateDeletePOCView.as_view(), name='update_delete_poc'), 
     path('addsponsor/',AddAcceptedView.as_view()),
     path('sponsors/',DisplaySponsorsEventView.as_view(), name='display_sponsor_event'),
+    path('sponsor/<int:sponsor_id>/',UpdateSponsorView.as_view(), name='update_sponsor'),
     path('usercompany/',DisplayUserCompanyView.as_view(), name='display_user_sponsors'),
     path('leaderboard/',LeaderboardView.as_view(),name="leaderboard"),
     path('piechart/',StatusPieChartView.as_view(),name="status_pie_chart"),

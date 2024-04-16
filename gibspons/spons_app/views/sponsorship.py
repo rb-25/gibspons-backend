@@ -23,6 +23,7 @@ class UpdateSponsorView(APIView):
         
     @staticmethod
     def patch(request,sponsor_id):
+        print("sponsor_id",sponsor_id)
         sponsor=get_object_or_404(Sponsorship,id=sponsor_id)
         serializer=SponsorshipSerializer(sponsor,data=request.data,partial=True)    
         if serializer.is_valid():
