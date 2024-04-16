@@ -7,7 +7,7 @@ class Company(models.Model):
     class Meta:
         verbose_name = 'Company'
         verbose_name_plural = 'Companies'
-        unique_together = ['name', 'website']
+        unique_together = ['name', 'website','organisation']
     
     name=models.CharField(max_length=254)
     website=models.URLField()

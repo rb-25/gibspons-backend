@@ -32,6 +32,8 @@ class CreateDisplayCompanyView(APIView):
         organisation_id = request.query_params.get('org')
         if organisation_id is None:
             return Response({'detail': 'Organization ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.organisation.id != int(organisation_id):
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_401_UNAUTHORIZED)
         
         companies = Company.objects.filter(organisation=organisation_id)
         
