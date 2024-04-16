@@ -66,7 +66,7 @@ class AIGeneratorSerializer(serializers.Serializer):
     
     poc_id=serializers.IntegerField()
     event_id=serializers.IntegerField()
-    additional=serializers.CharField()
+    additional=serializers.CharField(required=False)
 
 #--------LEADERBOARD SERIALIZER-------------------
 
