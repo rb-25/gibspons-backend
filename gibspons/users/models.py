@@ -1,6 +1,7 @@
 from django.db import models
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from spons_app.models import Event
 
 class Organisation(models.Model):
     name=models.CharField(max_length=255)
@@ -10,6 +11,18 @@ class Organisation(models.Model):
     logo=models.URLField()    #how do i validate that its an image
     created_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
+    
+    @property
+    def events(self):
+        return Event.objects.filter(organisation=self).all()
+    
+    @property
+    def total_money_raised(self):
+        total=0
+        for event in self.events:
+            print(event.money_raised)
+            total+=event.money_raised
+        return total
     
 class User(AbstractUser):
     ROLE_CHOICES = [

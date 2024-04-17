@@ -98,6 +98,8 @@ class DisplayUserCompanyView(APIView):
         sponsors = Sponsorship.objects.filter(contacted_by=user_id)
         if not sponsors:
             return Response({'detail': 'No companies found for the given User ID'}, status=status.HTTP_404_NOT_FOUND)
+        search_filter = SearchFilter()
+        queryset=search_filter.filter_queryset(request=request,queryset=sponsors,view=self)
         sponsor_serializer = SponsorshipSerializer(sponsors, many=True)
         return Response(sponsor_serializer.data, status=status.HTTP_200_OK)
 
@@ -108,6 +110,7 @@ class AddAcceptedView(APIView):
     
     permission_classes=[IsAuthenticated,IsAdmin,IsApproved]
     authentication_classes=[JWTAuthentication]
+    
     def post(self,request):
         serializer=SponsorshipSerializer(data=request.data)
         if serializer.is_valid():           

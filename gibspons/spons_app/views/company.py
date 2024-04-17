@@ -22,9 +22,9 @@ class CreateDisplayCompanyView(APIView):
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
-    filterset_fields = ["name", "status","updated_at","user_id__username"]
-    search_fields = ["name","user_id__username","status"]
-    ordering_fields = ["name","status"]
+    filterset_fields = ["name"]
+    search_fields = ["name"]
+    ordering_fields = ["name"]
     ordering = ["name"]
     
     def get(self,request):
@@ -39,8 +39,7 @@ class CreateDisplayCompanyView(APIView):
         
         if not companies:
             return Response({'detail': 'No companies found for the given organization ID'}, status=status.HTTP_404_NOT_FOUND)
-        
-        #queryset = SearchFilter.filter_queryset(request, companies,queryset, view=self)
+            
         company_serializer = CompanySerializer(companies, many=True)
         return Response(company_serializer.data, status=status.HTTP_200_OK)
     
