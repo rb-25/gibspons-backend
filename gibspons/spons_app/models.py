@@ -88,4 +88,12 @@ class Event(models.Model):
         return total
 
 
+class Leaderboard(models.Model):
+    """Model for leaderboard data"""
     
+    class Meta:
+        unique_together = ['user', 'event']
+        
+    user=models.ForeignKey('users.User',on_delete=models.CASCADE)
+    event=models.ForeignKey('Event',on_delete=models.CASCADE)
+    points=models.IntegerField(default=0)

@@ -37,10 +37,7 @@ class CreateDisplayPOCView(APIView):
                 poc_objects.append(serializer.data)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        request.user.points += len(poc_objects)
-        request.user.save()
-
+            
         return Response(poc_objects, status=status.HTTP_201_CREATED)
     
     @staticmethod    

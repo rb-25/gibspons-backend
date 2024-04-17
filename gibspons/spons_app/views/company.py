@@ -8,8 +8,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 
-from spons_app.models import Company, Sponsorship
-from spons_app.serializers import CompanySerializer, SponsorshipSerializer
+from spons_app.models import Company, Sponsorship, Leaderboard
+from spons_app.serializers import CompanySerializer, SponsorshipSerializer,LeaderboardSerializer
 
 from spons_app.customs.permissions import IsCompanyCreator,IsApproved
 from spons_app.customs.pagination import CustomPagination
@@ -50,17 +50,20 @@ class CreateDisplayCompanyView(APIView):
         
         curr_user = request.user
         current_organization_id = curr_user.organisation
-               
+        
         name = request.data.get('name')
         website = request.data.get('website')
         existing_company = Company.objects.filter(name=name, website=website).first()
-
+        print("1")
+        
         if not existing_company:
+            print("2")
             company_serializer = CompanySerializer(data=request.data)
             company_serializer.is_valid(raise_exception=True)
             print("exists")
             company = company_serializer.save(organisation=current_organization_id)
         else:
+            print("3")
             company = existing_company
             company_serializer = CompanySerializer(company)
 
@@ -71,8 +74,26 @@ class CreateDisplayCompanyView(APIView):
             'status': 'Not Contacted' 
         }
         sponsorship_serializer = SponsorshipSerializer(data=sponsorship_data)
+        print("4")
         sponsorship_serializer.is_valid(raise_exception=True)
         sponsorship_serializer.save()
+        
+        existing_leaderboard = Leaderboard.objects.filter(user=request.user.id, event=request.data.get('event_id')).first()
+        if not existing_leaderboard:
+            print("5")
+            leaderboard_data = {
+                'event' : request.data.get('event_id'),
+                'user' : request.user.id,
+                'points' : 1
+            }
+            leaderboard_serializer = LeaderboardSerializer(data=leaderboard_data)
+            leaderboard_serializer.is_valid(raise_exception=True)
+            leaderboard = leaderboard_serializer.save()
+        else:
+            print("6")
+            leaderboard = existing_leaderboard
+            leaderboard.points += 1
+            leaderboard.save()
         
         return Response({
             'company': company_serializer.data,

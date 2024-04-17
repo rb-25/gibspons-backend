@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from users.models import User
-from spons_app.models import Company,Sponsorship
+from spons_app.models import Company,Sponsorship,Leaderboard
 from spons_app.serializers import LeaderboardSerializer
 
 
@@ -14,8 +14,8 @@ class LeaderboardView(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     def get(self,request):
-        organisation_id = request.query_params.get('org')
-        leaderboard_data = User.objects.filter(organisation=organisation_id).order_by('-points')
+        event_id = request.query_params.get('event')
+        leaderboard_data = Leaderboard.objects.filter(event=event_id).order_by('-points')
         serializer = LeaderboardSerializer(leaderboard_data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

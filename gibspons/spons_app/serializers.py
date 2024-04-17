@@ -70,8 +70,12 @@ class AIGeneratorSerializer(serializers.Serializer):
 
 #--------LEADERBOARD SERIALIZER-------------------
 
-class LeaderboardSerializer(serializers.Serializer):
+class LeaderboardSerializer(serializers.ModelSerializer):
     
-    username=serializers.CharField()
-    points=serializers.IntegerField()
+    user_name = serializers.CharField(source='user.username',required=False,read_only=True)
+    event_name = serializers.CharField(source='event.name',required=False,read_only=True)
+    
+    class Meta:
+        model=Leaderboard
+        fields=['user','event','points','user_name','event_name']
     
