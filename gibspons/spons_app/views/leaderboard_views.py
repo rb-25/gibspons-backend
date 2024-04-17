@@ -6,7 +6,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from users.models import User
-from spons_app.models import Company
+from spons_app.models import Company,Sponsorship
 from spons_app.serializers import LeaderboardSerializer
 
 
@@ -23,8 +23,8 @@ class StatusPieChartView(APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     def get(self,request):
-        organisation_id = request.query_params.get('org')
-        data = Company.objects.filter(organisation=organisation_id).values('status').annotate(count=Count('id'))
+        event = request.query_params.get('event')
+        data = Sponsorship.objects.filter(event_id=event).values('status').annotate(count=Count('id'))
 
         # Prepare data for response
         response_data = {}
