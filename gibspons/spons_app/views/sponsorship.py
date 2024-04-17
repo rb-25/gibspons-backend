@@ -113,6 +113,10 @@ class AddAcceptedView(APIView):
     
     def post(self,request):
         serializer=SponsorshipSerializer(data=request.data)
+        company=get_object_or_404(Company,id=request.data.get('company'))
+        event=get_object_or_404(Event,id=request.data.get('event'))
+        if request.user.organisation.id != company.organisation.id or request.user.organisation != event.organisation:
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_401_UNAUTHORIZED)
         if serializer.is_valid():           
             existing_sponsorship=Sponsorship.objects.filter(company=serializer.validated_data['company']).first()
             if existing_sponsorship and 'money_donated' in serializer.validated_data :
