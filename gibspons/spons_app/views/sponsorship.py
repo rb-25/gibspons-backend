@@ -52,16 +52,22 @@ class DisplaySponsorsEventView(APIView):
     def get(self, request):
         org_id = request.user.organisation.id
         event_id = request.query_params.get('event')
+        if request.user.organisation.id != int(org_id):
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_401_UNAUTHORIZED)
         if event_id is not None:
             event=get_object_or_404(Event,id=event_id)
             sponsorships = event.sponsorships
+            event_serializer = EventSerializer(event)
             if sponsorships.count() == 0:
-                return Response({'detail': 'No sponsors found for the given Event ID'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({
+                "event": event_serializer.data,
+                "sponsorships": []},
+                status=status.HTTP_404_NOT_FOUND)
             
             total_money_raised = event.money_raised
 
             sponsorship_serializer = SponsorshipSerializer(sponsorships, many=True)
-            event_serializer = EventSerializer(event)
+            
 
             return Response({
             "event": event_serializer.data,
