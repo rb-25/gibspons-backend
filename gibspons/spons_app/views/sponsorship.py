@@ -62,7 +62,7 @@ class DisplaySponsorsEventView(APIView):
                 return Response({
                 "event": event_serializer.data,
                 "sponsorships": []},
-                status=status.HTTP_404_NOT_FOUND)
+                status=status.HTTP_200_OK)
             
             total_money_raised = event.money_raised
 
@@ -77,7 +77,7 @@ class DisplaySponsorsEventView(APIView):
         else:
             sponsor= Sponsorship.objects.filter(company__organisation=org_id)
             if not sponsor:
-                return Response({'detail': 'No sponsors found for the given Organisation ID'}, status=status.HTTP_404_NOT_FOUND)    
+                return Response({'detail': []}, status=status.HTTP_200_OK)    
             sponsor_serializer = SponsorshipSerializer(sponsor, many=True)
             return Response(sponsor_serializer.data, status=status.HTTP_200_OK)
         
