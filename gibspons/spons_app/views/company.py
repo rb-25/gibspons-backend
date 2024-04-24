@@ -30,6 +30,7 @@ class CreateDisplayCompanyView(APIView):
     def get(self,request):
         
         organisation_id = request.query_params.get('org')
+        company_id = request.query_params.get('id')
         if organisation_id is None:
             return Response({'detail': 'Organization ID is required'}, status=status.HTTP_400_BAD_REQUEST)
         if request.user.organisation.id != int(organisation_id):
@@ -39,6 +40,13 @@ class CreateDisplayCompanyView(APIView):
         
         if not companies:
             return Response({'detail': 'No companies found for the given organization ID'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if company_id:
+            company = get_object_or_404(Company, id=company_id)
+            company_serializer = CompanySerializer(company)
+            if company.organisation.id != int(organisation_id):
+                return Response({'detail': 'Permission denied'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(company_serializer.data, status=status.HTTP_200_OK)
             
         company_serializer = CompanySerializer(companies, many=True)
         return Response(company_serializer.data, status=status.HTTP_200_OK)
@@ -53,16 +61,12 @@ class CreateDisplayCompanyView(APIView):
         name = request.data.get('name')
         website = request.data.get('website')
         existing_company = Company.objects.filter(name=name, website=website).first()
-        print("1")
         
         if not existing_company:
-            print("2")
             company_serializer = CompanySerializer(data=request.data)
             company_serializer.is_valid(raise_exception=True)
-            print("exists")
             company = company_serializer.save(organisation=current_organization_id)
         else:
-            print("3")
             company = existing_company
             company_serializer = CompanySerializer(company)
 
@@ -73,7 +77,6 @@ class CreateDisplayCompanyView(APIView):
             'status': 'Not Contacted' 
         }
         sponsorship_serializer = SponsorshipSerializer(data=sponsorship_data)
-        print("4")
         sponsorship_serializer.is_valid(raise_exception=True)
         sponsorship_serializer.save()
         
@@ -106,7 +109,7 @@ class UpdateDeleteCompanyView(APIView):
     
     permission_classes=[IsAuthenticated,IsCompanyCreator,IsApproved]
     authentication_classes=[JWTAuthentication]
-        
+    
     @staticmethod
     def patch(request,company_id):
         company=get_object_or_404(Company,id=company_id)
