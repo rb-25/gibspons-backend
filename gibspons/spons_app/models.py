@@ -7,10 +7,10 @@ class Company(models.Model):
     class Meta:
         verbose_name = 'Company'
         verbose_name_plural = 'Companies'
-        unique_together = ['name', 'website','organisation']
+        unique_together = ['name', 'website','organisation','linkedin']
     
     name=models.CharField(max_length=254)
-    website=models.URLField()
+    website=models.URLField(null=True)
     industry=models.CharField(max_length=50)
     linkedin=models.URLField(null=True)    
     organisation=models.ForeignKey('users.Organisation',on_delete=models.CASCADE)
@@ -28,8 +28,8 @@ class POC(models.Model):
     name=models.CharField(max_length=254)
     company=models.ForeignKey('Company',on_delete=models.CASCADE)
     designation=models.CharField(max_length=254)
-    email=models.EmailField()
-    linkedin=models.URLField()
+    email=models.EmailField(null=True)
+    linkedin=models.URLField(null=True)
     phone=models.CharField(max_length=15,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
