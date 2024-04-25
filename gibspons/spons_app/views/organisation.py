@@ -23,6 +23,6 @@ class DisplayOrganisationView(APIView):
             organisation_id = request.user.organisation_id
             organisation=Organisation.objects.get(id=organisation_id)
             organisation_serializer = OrganisationSerializer(organisation)
-            return Response(organisation_serializer.data, status=status.HTTP_200_OK)
+            return Response({"detail": organisation_serializer.data}, status=status.HTTP_200_OK)
         except Organisation.DoesNotExist:
             return Response([], status=status.HTTP_200_OK)

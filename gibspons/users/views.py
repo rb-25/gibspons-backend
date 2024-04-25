@@ -162,7 +162,7 @@ class VerifyResetPasswordOTPView(APIView):
         else:
             return Response({"detail": "Wrong OTP value."}, status=HTTPStatus.BAD_REQUEST)
 
-        return Response({"detail": "Password reset successful!"}, status=HTTPStatus.OK)
+        return Response({"message": "Password reset successful!"}, status=HTTPStatus.OK)
     
 #---------------USER VIEWS---------------
 
@@ -179,7 +179,7 @@ class UpdateDisplayUserView(APIView):
                 return Response({'detail':'You cannot change role'}, status=status.HTTP_403_FORBIDDEN)
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
     
     @staticmethod
     def get(request):
@@ -240,7 +240,7 @@ class ApproveView(APIView):
         user.is_approved=True
         user.organisation_id=request.user.organisation.id
         user.save()
-        return Response({'detail':'User approved'},status=status.HTTP_200_OK)
+        return Response({'message':'User approved'},status=status.HTTP_200_OK)
         
 #-----------ORGANISATIONS VIEWS---------------
 
@@ -250,7 +250,7 @@ class CreateOrganisationView(APIView):
     def post(self,request):
         token = request.auth
         if not token:
-            return Response({'message': 'Authentication credentials not provided'}, status=401)
+            return Response({'detail': 'Authentication credentials not provided'}, status=401)
         print(f"Token: {token}")
         serializer=OrganisationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -280,7 +280,7 @@ class JoinOrganisationView(APIView):
 
             return Response({'message': 'Waiting for approval'}, status=status.HTTP_200_OK)
 
-        return Response({'message': 'Validation error', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Validation error', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
