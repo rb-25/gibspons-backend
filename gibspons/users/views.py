@@ -1,6 +1,10 @@
+import uuid
 from http import HTTPStatus
+from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -8,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from .serializers import UserSerializer,JoinOrganisationSerializer,OrganisationSerializer,ChangeRoleSerializer
-from .models import User, Organisation
+from .models import User, Organisation,OTP
 from .permissions import IsAdmin, IsOwner, IsApproved
 
 class CheckView(APIView):
@@ -94,6 +98,72 @@ class LogoutView(APIView):
         }
         return response
 
+class ResetPasswordView(APIView):
+    permission_classes = []
+    authentication_classes = []
+
+    @staticmethod
+    def post(request):
+        email = request.data.get("email", None)
+
+        if email == None:
+            return Response({"detail": "Please enter email!"}, status=HTTPStatus.BAD_REQUEST)
+
+        user = get_object_or_404(User, email=email)
+        if OTP.objects.filter(user=user).exists():
+            OTP.objects.get(user=user).delete()
+            
+        hvalue=uuid.uuid4().hex[:6]
+        ivalue=int(hvalue,16)%1000000
+        otp = OTP.objects.create(user=user, value=ivalue)
+        message = f"OTP for resetting password is: {otp.value}. It will be active for 5 minutes."
+        send_mail(
+            f"SWC: {otp} OTP",
+            message,
+            "aarabibalakrishnan2@gmail.com",
+            recipient_list=[user.email],
+            fail_silently=True,
+        )
+
+        return Response(
+            {"detail": "OTP sent to email! Please verify account."},
+            status=HTTPStatus.OK,
+        )
+
+
+class VerifyResetPasswordOTPView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @staticmethod
+    def post(request):
+        email = request.query_params.get("email", None)
+        otp = request.data.get("otp")
+        new_password = request.data.get("new_password")
+
+        if email in [None, ""] or otp in [None, ""] or new_password in [None, ""]:
+            return Response(
+                {"detail": "Please enter all the fields!"},
+                status=HTTPStatus.BAD_REQUEST,
+            )
+
+        user = get_object_or_404(User, email=email)
+        otp_object = get_object_or_404(OTP, user=user)
+        if otp == int(otp_object.value):
+            if otp_object.expiry_date > timezone.now():
+                user.password = make_password(new_password)
+                otp_object.delete()
+                user.save()
+            else:
+                return Response(
+                    {"detail": "OTP expired! Please generate a new OTP."},
+                    status=HTTPStatus.BAD_REQUEST,
+                )
+        else:
+            return Response({"detail": "Wrong OTP value."}, status=HTTPStatus.BAD_REQUEST)
+
+        return Response({"detail": "Password reset successful!"}, status=HTTPStatus.OK)
+    
 #---------------USER VIEWS---------------
 
 class UpdateDisplayUserView(APIView):

@@ -1,16 +1,14 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import RegisterView,LoginView,LogoutView,CreateOrganisationView,JoinOrganisationView,DeleteUserView,ChangeRoleView,UpdateDisplayUserView,ApproveView, CheckView,DisplayAllUsersView
+from .views import RegisterView,LoginView,LogoutView,CreateOrganisationView,JoinOrganisationView,DeleteUserView,ChangeRoleView,UpdateDisplayUserView,ApproveView, CheckView,DisplayAllUsersView,ResetPasswordView,VerifyResetPasswordOTPView
 
 urlpatterns = [
     path('check', CheckView.as_view(),name="check"),
     path('register/', RegisterView.as_view(),name="register"),
     path('login/', LoginView.as_view(),name="login"),
     path('logout/', LogoutView.as_view(),name="logout"),    
-    path('reset_password/',auth_views.PasswordResetView.as_view(),name="reset_password"),
-    path('reset_password_sent/',auth_views.PasswordResetDoneView.as_view(),name="password_reset_done"),
-    path('reset/<uidb64>/<token>/',auth_views.PasswordResetConfirmView.as_view(),name="password_reset_confirm"),
-    path('reset_password_complete/',auth_views.PasswordResetCompleteView.as_view(),name="password_reset_complete"),
+    path("reset_password/", ResetPasswordView.as_view(), name="reset_password"),
+    path("verify_reset_password_otp/",VerifyResetPasswordOTPView.as_view(), name="verify_reset_password_otp"),
     path('user/',UpdateDisplayUserView.as_view(),name="update_user"),
     path('user/<int:user_id>',DeleteUserView.as_view(),name="delete_user"),
     path('displayall/',DisplayAllUsersView.as_view(),name="display_all_users"),

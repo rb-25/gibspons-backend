@@ -1,5 +1,7 @@
 from django.db import models
-from django.db import models
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from spons_app.models import Event
 
@@ -41,7 +43,30 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     
     REQUIRED_FIELDS=[]
-    
-    
 
+def get_expiry_date() -> datetime:
+    return timezone.now() + timedelta(minutes=5)
+   
+class OTP(models.Model):
+    """
+    Model for storing OTPs
+    """
+
+    class Meta:
+        verbose_name = "OTP"
+        verbose_name_plural = "OTPs"
+
+    def validate_otp_value(value):
+        if value.is_digit():
+            return value
+        else:
+            return ValidationError("Invalid value for OTP(cannot contain anything other than digits)!") 
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="otp")
+    value = models.CharField(max_length=6, validators=[validate_otp_value])
+    expiry_date = models.DateTimeField(default=get_expiry_date)
+
+    def reset_expiry_date(self):
+        self.expiry_date = get_expiry_date()
+        self.save()
     
