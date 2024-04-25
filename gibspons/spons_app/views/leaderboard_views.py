@@ -11,6 +11,9 @@ from spons_app.serializers import LeaderboardSerializer
 
 
 class LeaderboardView(APIView):
+    
+    """ View to display leaderboard by event """
+    
     permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     def get(self,request):
@@ -20,6 +23,9 @@ class LeaderboardView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class StatusPieChartView(APIView):
+    
+    """ View to display pie chart of all status by event """
+    
     permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     def get(self,request):

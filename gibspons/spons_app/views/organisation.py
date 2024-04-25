@@ -15,6 +15,9 @@ from spons_app.customs.pagination import CustomPagination
 
 
 class DisplayOrganisationView(APIView):
+    
+    """ View to display an organisation """
+    
     permission_classes = [IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     

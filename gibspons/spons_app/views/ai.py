@@ -11,6 +11,9 @@ from spons_app.models import Company,POC,Event
 from spons_app.config import model
 
 class EmailGeneratorView(APIView):
+    
+    """ This generates an email based on the information provided """
+    
     permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     def post(self,request):
@@ -27,6 +30,9 @@ class EmailGeneratorView(APIView):
         return Response({"message":response_html})
         
 class LinkedInGeneratorView(APIView):
+    
+    """ View to generate linkedin request """
+    
     permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     def post(self,request):
@@ -37,7 +43,7 @@ class LinkedInGeneratorView(APIView):
         organisation=get_object_or_404(Organisation,id=company.organisation.id)
         event=get_object_or_404(Event, id=serializer.validated_data['event_id'])
         user=get_object_or_404(User,id=request.user.id)
-        prompt = f"Ignore all previous prompts. Here is the information you are provided with. {organisation.name} is an organisation from {organisation.location} and they are organising an event {event.name}. The event is being hosted from {event.start_date} to {event.end_date} with expected registrations {event.expected_reg}. Additional information about the event is {event.description}. Assume you are {user.name}, a manager at {organisation.name} Write me a professional linkedin request inviting the POC {poc.name} from {company.name} with the designation {poc.designation} to sponsor the event hosted by our organisation. The company is in the {company.industry} industry. Our organisation is in the {organisation.industry}. Additional information given is {serializer.validated_data['additional']} Write this linkedin in 50 to 100 words. "
+        prompt = f"Ignore all previous prompts. Here is the information you are provided with. {organisation.name} is an organisation from {organisation.location} and they are organising an event {event.name}. The event is being hosted from {event.start_date} to {event.end_date} with expected registrations {event.expected_reg}. Additional information about the event is {event.description}. Assume you are {user.name}, a manager at {organisation.name} Write me a professional linkedin request inviting the POC {poc.name} from {company.name} with the designation {poc.designation} to sponsor the event hosted by our organisation. The company is in the {company.industry} industry. Our organisation is in the {organisation.industry}. Additional information given is {serializer.validated_data['additional']} Write a linkedin request in 50 to 100 words for this. "
         response = model.generate_content(prompt)
         response_html=markdown.markdown(response.text).replace('\n','')
         return Response({"message":response_html})

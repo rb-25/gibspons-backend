@@ -59,6 +59,7 @@ class Sponsorship(models.Model):
     objects = models.Manager()
     
 class Event(models.Model):
+    
     """ Model for Event details """
     
     class Meta:
@@ -89,6 +90,7 @@ class Event(models.Model):
 
 
 class Leaderboard(models.Model):
+    
     """Model for leaderboard data"""
     
     class Meta:

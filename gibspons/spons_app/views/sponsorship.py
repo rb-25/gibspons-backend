@@ -16,9 +16,9 @@ from spons_app.customs.pagination import CustomPagination
 
 class UpdateSponsorView(APIView):
     
-    """ View to update """
+    """ View to update sponsor """
     
-    permission_classes=[IsAuthenticated,IsCompanyCreator,IsApproved]
+    permission_classes=[IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
         
     @staticmethod

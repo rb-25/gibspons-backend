@@ -22,6 +22,9 @@ class CheckView(APIView):
 #---------------AUTH VIEWS---------------------
 
 class RegisterView(APIView):
+    
+    """ View to register users """
+    
     permission_classes = [AllowAny]
     def post(self, request):
         serializer=UserSerializer(data=request.data)
@@ -33,6 +36,9 @@ class RegisterView(APIView):
         return Response(serializer.data)
 
 class LoginView(APIView):
+    
+    """View for users to login"""
+    
     permission_classes = []
     authentication_classes = []
 
@@ -89,7 +95,10 @@ class LoginView(APIView):
         )
 
 class LogoutView(APIView):
-    permission_classes = [AllowAny]
+    
+    """ View for users to logout """
+    
+    permission_classes = []
     def post(self, request):
         response = Response()
         response.delete_cookie('jwt')
@@ -99,6 +108,9 @@ class LogoutView(APIView):
         return response
 
 class ResetPasswordView(APIView):
+    
+    """View for resetting password"""
+    
     permission_classes = []
     authentication_classes = []
 
@@ -132,6 +144,9 @@ class ResetPasswordView(APIView):
 
 
 class VerifyResetPasswordOTPView(APIView):
+    
+    """ View to veryify otp of reset password """
+    
     authentication_classes = []
     permission_classes = []
 
@@ -167,6 +182,9 @@ class VerifyResetPasswordOTPView(APIView):
 #---------------USER VIEWS---------------
 
 class UpdateDisplayUserView(APIView):
+    
+    """ View to update or display a user/s """
+    
     permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     
@@ -183,27 +201,28 @@ class UpdateDisplayUserView(APIView):
     
     @staticmethod
     def get(request):
-        users=User.objects.filter(id=request.user.id)
-        user_serializer = UserSerializer(users, many=True)
-        return Response(user_serializer.data, status=status.HTTP_200_OK)
-
-class DisplayAllUsersView(APIView):
-    permission_classes=[IsAuthenticated,IsApproved]
-    authentication_classes=[JWTAuthentication]
-    def get(self, request):
-        organisation_id = request.query_params.get('org')
+        
+        organisation_id = request.query_params.get('org')        
+        if organisation_id is None:            
+            users=User.objects.filter(id=request.user.id)
+            user_serializer = UserSerializer(users, many=True)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+        
         if int(request.user.organisation.id) != int(organisation_id):
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
-        if organisation_id is None:
-            return Response({'detail': 'Organisation ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
         if request.user.role == 'admin' or request.user.role == 'owner':
             users = User.objects.filter(organisation=organisation_id)
         else:
             users = User.objects.filter(organisation=organisation_id, is_approved=True)
         user_serializer = UserSerializer(users, many=True)
         return Response(user_serializer.data, status=status.HTTP_200_OK)
-      
+
+     
 class DeleteUserView(APIView):
+    
+    """ View to delete user. Can be done by admin """
+    
     permission_classes = [IsAuthenticated,IsApproved]
     authentication_classes=[JWTAuthentication]
     def delete(self, request,user_id):
@@ -217,13 +236,19 @@ class DeleteUserView(APIView):
 
 #allowing only owner to assign admins
 class ChangeRoleView(APIView):
-    permission_classes = [IsAuthenticated, IsOwner,IsApproved]
+    
+    """ Allowing owner to change roles """
+    
+    permission_classes = [IsAuthenticated, IsApproved]
     authentication_classes=[JWTAuthentication]
 
     def post(self, request):
         serializer = ChangeRoleSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_to_change = get_object_or_404(User,id=serializer.validated_data['id'])
+        all_owners = User.objects.filter(role="owner",organisation=request.user.organisation)
+        if user_to_change.role == "owner" and len(all_owners)==1:
+            return Response({'detail' : 'Please set another owner before changing'})
         user_to_change.role = serializer.data['role'].lower()
         user_to_change.save()          
 

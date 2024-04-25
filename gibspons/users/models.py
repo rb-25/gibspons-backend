@@ -6,6 +6,9 @@ from django.contrib.auth.models import AbstractUser
 from spons_app.models import Event
 
 class Organisation(models.Model):
+    
+    """ Model for storing organisation information """
+    
     name=models.CharField(max_length=255)
     invite_code = models.CharField(max_length=8, unique=True, blank=True)
     industry=models.CharField(max_length=255)
@@ -27,6 +30,9 @@ class Organisation(models.Model):
         return total
     
 class User(AbstractUser):
+    
+    """ Model for storing user information """
+    
     ROLE_CHOICES = [
         ('user', 'User'),
         ('owner', 'Owner'),
@@ -48,9 +54,8 @@ def get_expiry_date() -> datetime:
     return timezone.now() + timedelta(minutes=5)
    
 class OTP(models.Model):
-    """
-    Model for storing OTPs
-    """
+    
+    """ Model for storing OTPs """
 
     class Meta:
         verbose_name = "OTP"

@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ChangeRoleSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     role = serializers.CharField()
-    is_approved=serializers.BooleanField()
+    is_approved=serializers.BooleanField(source='User.is_approved',required=False)
 
 #-----------ORGANISATION SERIALIZERS--------
 
