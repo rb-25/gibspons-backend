@@ -211,7 +211,7 @@ class DeleteUserView(APIView):
         if user_to_delete != request.user.id or request.user.role not in ['admin','owner']:
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
         user_to_delete.delete()
-        return Response({'message': 'POC deleted successfully'}, status=status.HTTP_200_OK)
+        return Response({'message': 'User deleted successfully'}, status=status.HTTP_200_OK)
 
 #--------------ADMIN VIEWS--------------------
 
