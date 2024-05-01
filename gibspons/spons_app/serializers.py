@@ -53,12 +53,13 @@ class POCCompanySerializer(serializers.ModelSerializer):
 class SponsorshipSerializer(serializers.ModelSerializer):
     
     company_name = serializers.CharField(source='company.name',required=False,read_only=True)
+    poc_name=serializers.CharField(source='poc.name',required=False,read_only=True)
     user_name = serializers.CharField(source='contacted_by.username',required=False,read_only=True)
     event_name = serializers.CharField(source='event.name',required=False,read_only=True)
     
     class Meta:
         model=Sponsorship
-        fields=['id','company','poc','event','event_name','contacted_by','user_name','updated_at','status','type_of_sponsorship','money_donated','additional','company_name']
+        fields=['id','company','company_name','poc','poc_name','event','event_name','contacted_by','user_name','updated_at','status','type_of_sponsorship','money_donated','additional']
 
 #---------AI SERIALIZER-------------------------
 
