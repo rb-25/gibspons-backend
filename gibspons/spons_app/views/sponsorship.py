@@ -34,7 +34,7 @@ class UpdateSponsorView(APIView):
                 return Response({'detail':'Permission denied'},status=status.HTTP_401_UNAUTHORIZED)
             
             if any(serializer.validated_data.get(key) for key in ['money_donated', 'additional','type_of_sponsorship']) and serializer.validated_data['status']!='Accepted':
-                return Response({'detail':'Status must be accepted for this action'})
+                return Response({'detail':'Status must be accepted for this action'},status=status.HTTP_401_UNAUTHORIZED))
             
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
