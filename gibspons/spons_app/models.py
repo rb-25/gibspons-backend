@@ -54,6 +54,7 @@ class Sponsorship(models.Model):
     type_of_sponsorship=models.CharField(max_length=254,blank=True,null=True)
     money_donated=models.IntegerField(blank=True,null=True,default=0)
     additional=models.CharField(null=True)
+    remarks=models.CharField(max_length=500,null=True)
     updated_at=models.DateField(auto_now=True)    
     created_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()

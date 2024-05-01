@@ -59,7 +59,7 @@ class SponsorshipSerializer(serializers.ModelSerializer):
     
     class Meta:
         model=Sponsorship
-        fields=['id','company','company_name','poc','poc_name','event','event_name','contacted_by','user_name','updated_at','status','type_of_sponsorship','money_donated','additional']
+        fields=['id','company','company_name','poc','poc_name','event','event_name','contacted_by','user_name','updated_at','status','remarks''type_of_sponsorship','money_donated','additional']
 
 #---------AI SERIALIZER-------------------------
 
