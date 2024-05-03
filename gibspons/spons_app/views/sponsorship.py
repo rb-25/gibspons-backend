@@ -14,7 +14,7 @@ from spons_app.customs.permissions import IsCompanyCreator, IsPOCCreater,IsAppro
 from spons_app.customs.pagination import CustomPagination
    
 
-class UpdateSponsorView(APIView):
+class UpdateDeleteSponsorView(APIView):
     
     """ View to update sponsor """
     
@@ -39,6 +39,16 @@ class UpdateSponsorView(APIView):
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response({"detail" : serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+    
+    @staticmethod
+    def delete(request,sponsor_id):
+        sponsor=get_object_or_404(Sponsorship,id=sponsor_id)
+        if request.user.organisation.id != sponsor.company.organisation.id:
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_401_UNAUTHORIZED)
+        if request.user.role not in ['admin','owner']:
+            return Response({'detail':'Permission denied'},status=status.HTTP_401_UNAUTHORIZED)
+        sponsor.delete()
+        return Response({'detail' : 'Sponsor deleted successfully'},status=status.HTTP_200_OK)
 
 class DisplaySponsorsEventView(APIView):
     
