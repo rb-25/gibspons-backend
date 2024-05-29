@@ -30,10 +30,11 @@ class RegisterView(APIView):
         serializer=UserSerializer(data=request.data)
         try:
             serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data)
         except:
             return Response({"detail":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
-        serializer.save()
-        return Response(serializer.data)
+        
     def get(self,request):
         serializer = UserSerializer(User.objects.all(), many=True)
         return Response(serializer.data)
