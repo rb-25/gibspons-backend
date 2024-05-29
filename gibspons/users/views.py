@@ -32,8 +32,13 @@ class RegisterView(APIView):
             serializer.is_valid()
             serializer.save()
             return Response(serializer.data)
-        except:
-            return Response({"detail":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            if 'email' in str(e):
+                return Response({'detail':'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            elif 'username' in str(e):
+                return Response({'detail':'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"detail":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
         
     def get(self,request):
         serializer = UserSerializer(User.objects.all(), many=True)
