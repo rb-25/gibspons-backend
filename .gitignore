@@ -2,6 +2,5 @@ venv/*
 db.sqlite3
 __pycache__/
 .env
-ai_views.py
 .github
 .hooks
