@@ -27,18 +27,32 @@ class RegisterView(APIView):
     
     permission_classes = [AllowAny]
     def post(self, request):
-        serializer=UserSerializer(data=request.data)
-        try:
-            serializer.is_valid()
-            serializer.save()
-            return Response(serializer.data)
-        except Exception as e:
-            if 'email' in str(e):
-                return Response({'detail':'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
-            elif 'username' in str(e):
-                return Response({'detail':'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({"detail":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+        username = request.data.get("username", None)
+        name = request.data.get("name", None)
+        email = request.data.get("email", None)
+        password = request.data.get("password", None)
+
+        print(f"Username: {username}, Name: {name}, Email: {email}, Password: {password}")
+        if None in [email,name,username,password] :
+            return Response(
+                {"detail": "Please fill in all the fields!"},
+                status=HTTPStatus.BAD_REQUEST,
+            )                
+
+        if User.objects.filter(username=username).exists():
+            return Response({'detail':'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        elif User.objects.filter(email=email).exists():
+            return Response({'detail':'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user = User.objects.create_user(
+                username=username,
+                name=name,
+                email=email,
+                password=password
+            )
+            user.save()     
+            user_serializer = UserSerializer(user)
+            return Response(user_serializer.data, status=status.HTTP_201_CREATED)
         
     def get(self,request):
         serializer = UserSerializer(User.objects.all(), many=True)
