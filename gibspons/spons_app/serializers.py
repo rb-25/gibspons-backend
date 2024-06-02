@@ -27,7 +27,7 @@ class POCSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(source='company.name',required=False,read_only=True)    
     class Meta:
         model=POC
-        fields=['id','company','name','email','linkedin','phone','company_name']
+        fields=['id','company','designation','name','email','linkedin','phone','company_name']
         
     def create(self, validated_data):
         validated_data.pop('user', None)
