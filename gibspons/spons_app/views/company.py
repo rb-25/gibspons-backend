@@ -76,9 +76,13 @@ class CreateDisplayCompanyView(APIView):
             'contacted_by':request.user.id,
             'status': 'Not Contacted' 
         }
-        sponsorship_serializer = SponsorshipSerializer(data=sponsorship_data)
-        sponsorship_serializer.is_valid(raise_exception=True)
-        sponsorship_serializer.save()
+        
+        if Sponsorship.objects.filter(company=company.id, event=request.data.get('event_id')).exists():
+            return Response({'detail': 'Company already exists for the given event'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            sponsorship_serializer = SponsorshipSerializer(data=sponsorship_data)
+            sponsorship_serializer.is_valid(raise_exception=True)
+            sponsorship_serializer.save()
         
         existing_leaderboard = Leaderboard.objects.filter(user=request.user.id, event=request.data.get('event_id')).first()
         if not existing_leaderboard:
