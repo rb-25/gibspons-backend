@@ -66,9 +66,10 @@ class Event(models.Model):
     class Meta:
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
+        unique_together = ['name', 'organisation','start_date']
         
     organisation=models.ForeignKey('users.Organisation',on_delete=models.CASCADE)
-    name=models.CharField(max_length=255,unique=True)
+    name=models.CharField(max_length=255)
     start_date=models.DateField()
     end_date=models.DateField()
     expected_reg=models.IntegerField(blank=True,null=True)

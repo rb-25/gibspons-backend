@@ -1,19 +1,20 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 from .views.organisation import DisplayOrganisationView
-from .views.event import CreateEventView, UpdateDeleteEventView,DisplayEventView
+from .views.event import EventViewSet
 from .views.sponsorship import AddAcceptedView,DisplaySponsorsEventView,DisplayUserCompanyView,UpdateDeleteSponsorView
 from .views.company import CreateDisplayCompanyView,UpdateDeleteCompanyView
 from .views.poc import CreateDisplayPOCView,UpdateDeletePOCView
 from .views.leaderboard_views import LeaderboardView,StatusPieChartView
 from .views.ai import EmailGeneratorView,LinkedInGeneratorView
 
+event_router=DefaultRouter()
+event_router.register(r'event',EventViewSet,basename='event')
+urlpatterns=event_router.urls
 
-urlpatterns = [
+urlpatterns += [
     
     path('organisation/',DisplayOrganisationView.as_view(),name="display organisation"),
-    path('event/display/',DisplayEventView.as_view(), name='display_event'),    
-    path('event/', CreateEventView.as_view(), name='create_event'),
-    path('event/<int:event_id>/',UpdateDeleteEventView.as_view(), name='update_delete_event'), 
     path('company/', CreateDisplayCompanyView.as_view(), name='create_company'),
     path('company/<int:company_id>/',UpdateDeleteCompanyView.as_view(), name='update_delete_company'),
     path('poc/', CreateDisplayPOCView.as_view(), name='create_display_poc'),
