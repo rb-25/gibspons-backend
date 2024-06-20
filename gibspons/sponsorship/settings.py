@@ -14,7 +14,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS =['gibspons.dscvit.com','127.0.0.1']
+ALLOWED_HOSTS =['gibspons.dscvit.com','127.0.0.1','api.gibspons.dscvit.com']
 
 # Application definition
 
@@ -66,7 +66,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sponsorship.wsgi.application'
 
 
-CSRF_TRUSTED_ORIGINS =['https://*gibspons.dscvit.com','https://localhost','https://127.0.0.1']
+CSRF_TRUSTED_ORIGINS =['https://*gibspons.dscvit.com','https://localhost','https://127.0.0.1','https://*gibspons.dscvit.com']
 CSRF_COOKIE_SECURE = True
 
 # Database

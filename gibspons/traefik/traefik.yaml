@@ -28,7 +28,7 @@ certificatesResolvers:
 http:
   routers:
     web-secure-router:
-      rule: "Host(`gibspons.dscvit.com`)" 
+      rule: "Host(`api.gibspons.dscvit.com`)" 
       entryPoints:
         - web-secure
       service: gibspons-api
