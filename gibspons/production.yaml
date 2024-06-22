@@ -14,9 +14,7 @@ services:
       - gibspons-network
   
   gibspons-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: aarabi/gibspons-gibspons-api:latests
     container_name: gibspons-api
     ports:
       - 8000:8000
