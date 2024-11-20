@@ -5,6 +5,10 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.viewsets import ViewSet
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
+from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 
@@ -15,53 +19,55 @@ from spons_app.customs.permissions import IsCompanyCreator,IsApproved
 from spons_app.customs.pagination import CustomPagination
 
 
-class CreateDisplayCompanyView(APIView):
-    
-    """View to create and display companies for an organisation"""
-    
-    permission_classes = [IsAuthenticated,IsApproved]
-    authentication_classes=[JWTAuthentication]
+class CompanyViewSet(ViewSet):
+    """
+    ViewSet to manage companies for an organization.
+    """
+    permission_classes = [IsAuthenticated, IsApproved]
+    authentication_classes = [JWTAuthentication]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
     filterset_fields = ["name"]
     search_fields = ["name"]
     ordering_fields = ["name"]
     ordering = ["name"]
-    
-    def get(self,request):
-        
+
+    def list(self, request):
+        """
+        Retrieve a list of companies or a specific company for an organization.
+        """
         organisation_id = request.query_params.get('org')
         company_id = request.query_params.get('id')
-        if organisation_id is None:
-            return Response({'detail': 'Organization ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not organisation_id:
+            return Response({'detail': 'Organization ID is required'}, status=HTTP_400_BAD_REQUEST)
         if request.user.organisation.id != int(organisation_id):
-            return Response({'detail': 'Permission denied'}, status=status.HTTP_401_UNAUTHORIZED)
-        
+            return Response({'detail': 'Permission denied'}, status=HTTP_401_UNAUTHORIZED)
+
         companies = Company.objects.filter(organisation=organisation_id)
-        
         if not companies:
-            return Response({'detail': 'No companies found for the given organization ID'}, status=status.HTTP_404_NOT_FOUND)
-        
+            return Response({'detail': 'No companies found for the given organization ID'}, status=HTTP_404_NOT_FOUND)
+
         if company_id:
             company = get_object_or_404(Company, id=company_id)
-            company_serializer = CompanySerializer(company)
             if company.organisation.id != int(organisation_id):
-                return Response({'detail': 'Permission denied'}, status=status.HTTP_401_UNAUTHORIZED)
-            return Response(company_serializer.data, status=status.HTTP_200_OK)
-            
-        company_serializer = CompanySerializer(companies, many=True)
-        return Response(company_serializer.data, status=status.HTTP_200_OK)
-    
-    def post(self,request):
-        
-        """This method creates a company and a sponsorship for the company."""
-        
+                return Response({'detail': 'Permission denied'}, status=HTTP_401_UNAUTHORIZED)
+            serializer = CompanySerializer(company)
+            return Response(serializer.data, status=HTTP_200_OK)
+
+        serializer = CompanySerializer(companies, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    def create(self, request):
+        """
+        Create a company and its sponsorship, and update the leaderboard.
+        """
         curr_user = request.user
         current_organization_id = curr_user.organisation
-        
+
         name = request.data.get('name')
         website = request.data.get('website')
         existing_company = Company.objects.filter(name=name, website=website).first()
-        
+
         if not existing_company:
             company_serializer = CompanySerializer(data=request.data)
             company_serializer.is_valid(raise_exception=True)
@@ -73,59 +79,53 @@ class CreateDisplayCompanyView(APIView):
         sponsorship_data = {
             'company': company.id,
             'event': request.data.get('event_id'),
-            'contacted_by':request.user.id,
-            'status': 'Not Contacted' 
+            'contacted_by': request.user.id,
+            'status': 'Not Contacted'
         }
-        
+
         if Sponsorship.objects.filter(company=company.id, event=request.data.get('event_id')).exists():
-            return Response({'detail': 'Company already exists for the given event'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            sponsorship_serializer = SponsorshipSerializer(data=sponsorship_data)
-            sponsorship_serializer.is_valid(raise_exception=True)
-            sponsorship_serializer.save()
+            return Response({'detail': 'Company already exists for the given event'}, status=HTTP_400_BAD_REQUEST)
         
-        existing_leaderboard = Leaderboard.objects.filter(user=request.user.id, event=request.data.get('event_id')).first()
-        if not existing_leaderboard:
-            print("5")
+        sponsorship_serializer = SponsorshipSerializer(data=sponsorship_data)
+        sponsorship_serializer.is_valid(raise_exception=True)
+        sponsorship_serializer.save()
+
+        leaderboard = Leaderboard.objects.filter(user=request.user.id, event=request.data.get('event_id')).first()
+        if not leaderboard:
             leaderboard_data = {
-                'event' : request.data.get('event_id'),
-                'user' : request.user.id,
-                'points' : 1
+                'event': request.data.get('event_id'),
+                'user': request.user.id,
+                'points': 1
             }
             leaderboard_serializer = LeaderboardSerializer(data=leaderboard_data)
             leaderboard_serializer.is_valid(raise_exception=True)
-            leaderboard = leaderboard_serializer.save()
+            leaderboard_serializer.save()
         else:
-            print("6")
-            leaderboard = existing_leaderboard
             leaderboard.points += 1
             leaderboard.save()
-        
+
         return Response({
             'company': company_serializer.data,
             'sponsorship': sponsorship_serializer.data
-        }, status=status.HTTP_201_CREATED)
-    
-    
-class UpdateDeleteCompanyView(APIView):
-    
-    """View to update and delete a company."""
-    
-    permission_classes=[IsAuthenticated,IsCompanyCreator,IsApproved]
-    authentication_classes=[JWTAuthentication]
-    
-    @staticmethod
-    def patch(request,company_id):
-        company=get_object_or_404(Company,id=company_id)
-        serializer=CompanySerializer(company,data=request.data,partial=True)    
+        }, status=HTTP_201_CREATED)
+
+    @action(detail=True, methods=['patch'], permission_classes=[IsAuthenticated, IsCompanyCreator, IsApproved])
+    def partial_update(self, request, pk=None):
+        """
+        Update a company partially.
+        """
+        company = get_object_or_404(Company, id=pk)
+        serializer = CompanySerializer(company, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response({"detail":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
-    
-    @staticmethod
-    def delete(request, company_id):
-        company_to_delete=get_object_or_404(Company,id=company_id)
-        company_to_delete.delete()
-        return Response({'message': 'Company deleted successfully'}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response({'detail': serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated, IsCompanyCreator, IsApproved])
+    def destroy(self, request, pk=None):
+        """
+        Delete a company.
+        """
+        company = get_object_or_404(Company, id=pk)
+        company.delete()
+        return Response({'message': 'Company deleted successfully'}, status=HTTP_200_OK)

@@ -14,61 +14,59 @@ from spons_app.customs.permissions import IsCompanyCreator, IsPOCCreater,IsAppro
 from spons_app.customs.pagination import CustomPagination
 
 
-class CreateDisplayPOCView(APIView):
+class POCViewSet(ViewSet):
     
-    """View to create and display POCs for a company"""
-    
-    permission_classes = [IsAuthenticated,IsApproved]
-    authentication_classes=[JWTAuthentication]
+    """ViewSet to create, update, delete, and display POCs for a company."""
+
+    permission_classes = [IsAuthenticated, IsApproved]
+    authentication_classes = [JWTAuthentication]
     filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
-    filterset_fields = ["name","company","email","linkedin","phone","user"]
-    search_fields = ["name","company","email","linkedin","phone","user"]
-    ordering_fields = ["name","company","user"]
+    filterset_fields = ["name", "company", "email", "linkedin", "phone", "user"]
+    search_fields = ["name", "company", "email", "linkedin", "phone", "user"]
+    ordering_fields = ["name", "company", "user"]
     ordering = ["company"]
-    
-    def post(self,request):
+
+    def list(self, request):
+        """Retrieve all POCs for a specific company."""
+        company_id = request.query_params.get('company')
+        if company_id is None:
+            return Response({'detail': 'Company ID is required'}, status=HTTP_400_BAD_REQUEST)
+
+        pocs = POC.objects.filter(company=company_id)
+        if not pocs:
+            return Response({'detail': 'No POC found for the given Company ID'}, status=HTTP_404_NOT_FOUND)
+
+        serializer = POCSerializer(pocs, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
+    def create(self, request):
+        """Create POCs in bulk."""
         poc_data_list = request.data
         poc_objects = []
 
         for poc_data in poc_data_list:
             serializer = POCSerializer(data=poc_data)
-            if serializer.is_valid():      
+            if serializer.is_valid():
                 serializer.save()
                 poc_objects.append(serializer.data)
             else:
-                return Response({"detail" : serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-            
-        return Response(poc_objects, status=status.HTTP_201_CREATED)
-    
-    @staticmethod    
-    def get(request):
-        company_id = request.query_params.get('company')
-        if company_id is None:
-            return Response({'detail': 'Company ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        poc = POC.objects.filter(company=company_id)
-        if not poc:
-            return Response({'detail': 'No POC found for the given Company ID'}, status=status.HTTP_404_NOT_FOUND)
-        poc_serializer = POCSerializer(poc, many=True)
-        return Response(poc_serializer.data, status=status.HTTP_200_OK)
+                return Response({"detail": serializer.errors}, status=HTTP_400_BAD_REQUEST)
 
-class UpdateDeletePOCView(APIView):
-    
-    """View to update and delete POCs for a company"""
-    
-    permission_classes=[IsAuthenticated,IsPOCCreater,IsApproved]
-    authentication_classes=[JWTAuthentication]
-    
-    @staticmethod
-    def patch(request,POC_id):
-        poc=get_object_or_404(POC,id=POC_id)
-        serializer=POCSerializer(poc,data=request.data,partial=True)
+        return Response(poc_objects, status=HTTP_201_CREATED)
+
+    @action(detail=True, methods=['patch'], url_path='update')
+    def partial_update(self, request, pk=None):
+        """Update a specific POC."""
+        poc = get_object_or_404(POC, id=pk)
+        serializer = POCSerializer(poc, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response({"detail" : serializer.errors},status=status.HTTP_400_BAD_REQUEST)
-    
-    @staticmethod
-    def delete(request,POC_id):
-        POC_to_delete=get_object_or_404(POC,id=POC_id)
-        POC_to_delete.delete()
-        return Response({'message': 'POC deleted successfully'}, status=status.HTTP_200_OK)  
+            return Response(serializer.data, status=HTTP_200_OK)
+        return Response({"detail": serializer.errors}, status=HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['delete'], url_path='delete')
+    def destroy(self, request, pk=None):
+        """Delete a specific POC."""
+        poc_to_delete = get_object_or_404(POC, id=pk)
+        poc_to_delete.delete()
+        return Response({'message': 'POC deleted successfully'}, status=HTTP_200_OK)
